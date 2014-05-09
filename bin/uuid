@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use UUID::Tiny ':std';
+
+printf( "%s\n", lc( create_uuid_as_string(UUID_V4) ) );
