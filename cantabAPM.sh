@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+set -x
+
 # Written by Cantab Research Ltd for use by American Public Media (APM), May 2014.
 # Dependencies: Julius, CMUseg_0.5, sox, ffmpeg.
 
@@ -30,7 +32,8 @@ mkdir -p $WORK
 
 # Runs CMUseg:
 echo "Running audio segmentation"
-ffmpeg -i "$INPUT" -ar 16000 -ac 1 $WORK/$wavName.wav < /dev/null 2> /dev/null
+#ffmpeg -i "$INPUT" -ar 16000 -ac 1 $WORK/$wavName.wav < /dev/null 2> /dev/null
+sox $INPUT -r 16k $WORK/$wavName.wav
 echo $wavName | perl -pe "s:^:$WORK/tmp-rec/:" | perl -pe 's:^(.*)/.*$:$1:' | sort -u | xargs --no-run-if-empty mkdir -p
 
 rm -f $WORK/splitFiles.dbl
@@ -63,9 +66,9 @@ if $QUEUE; then
   source $PREFIX/scripts/qq.sh
   qqSplit $WORK/test.scp $WORK/tmp/scp
   if $WPAIR; then
-    qqArray "/cantab/dev/apm/julius-4.3.1/julius/julius -C $JCONF -bs $BEAM -walign -h $AMDIR/juliusBin.mmf -hlist $AMDIR/julius.tie -input file -filelist $WORK/tmp/scp\$SGE_TASK_ID -v $LMBASE.dct -d $LMBASE.bin -lmp 13.0 0.0 -lmp2 13.0 0.0 -nlimit 8 -htkconf $AMDIR/hcopy-mfcc2.cfg " $WORK/tmp &> $WORK/log
+    qqArray "$PREFIX/tools/julius-4.3.1/julius/julius -C $JCONF -bs $BEAM -walign -h $AMDIR/juliusBin.mmf -hlist $AMDIR/julius.tie -input file -filelist $WORK/tmp/scp\$SGE_TASK_ID -v $LMBASE.dct -d $LMBASE.bin -lmp 13.0 0.0 -lmp2 13.0 0.0 -nlimit 8 -htkconf $AMDIR/hcopy-mfcc2.cfg " $WORK/tmp &> $WORK/log
   else
-    qqArray "/cantab/dev/apm/julius-4.3.1/julius/julius -C $JCONF -bs $BEAM -walign -h $AMDIR/juliusBin.mmf -hlist $AMDIR/julius.tie -input file -filelist $WORK/tmp/scp\$SGE_TASK_ID -v $LMBASE.dct -d $LMBASE.bin -lmp 13.0 0.0 -lmp2 13.0 0.0 -htkconf $AMDIR/hcopy-mfcc2.cfg " $WORK/tmp &> $WORK/log
+    qqArray "$PREFIX/tools/julius-4.3.1/julius/julius -C $JCONF -bs $BEAM -walign -h $AMDIR/juliusBin.mmf -hlist $AMDIR/julius.tie -input file -filelist $WORK/tmp/scp\$SGE_TASK_ID -v $LMBASE.dct -d $LMBASE.bin -lmp 13.0 0.0 -lmp2 13.0 0.0 -htkconf $AMDIR/hcopy-mfcc2.cfg " $WORK/tmp &> $WORK/log
   fi
 else
   if [ ! $WPAIR ]; then
