@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# CPAN modules
+use JSON;
+use File::Slurp;
+use Text::Wrap;
+use Data::Dump qw( dump );
+
+my $file        = shift(@ARGV) or die "$0 file.json\n";
+my $decoded     = decode_json( scalar read_file($file) );
+my $words_array = $decoded->{words};
+my @buf         = ();
+my @section     = ();
+for my $tok (@$words_array) {
+    my $word = $tok->{word};
+    if ( $word eq '<s>' ) {
+        @section = ();
+    }
+    elsif ( $word eq '</s>' ) {
+        push @buf, join( ' ', @section );
+    }
+    else {
+        push @section, $word;
+    }
+}
+
+#dump \@buf;
+
+printf("%s\n", wrap( '', '', @buf ));
