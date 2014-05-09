@@ -87,6 +87,7 @@ sub reload {
 }
 
 sub start_watcher {
+    return 1; # TODO
     my $cmd
         = "nohup $perl $watcher --default --pid_file=$watcher_pidfile 1>>$watcher_logfile 2>>$watcher_logfile &";
     print "Starting $watcher ...";
@@ -115,6 +116,7 @@ sub start_watcher {
 }
 
 sub stop_watcher {
+    return 1; # TODO
     print "Stopping $watcher ...";
     if ( !-s $watcher_pidfile ) {
         print "No PID file found at $watcher_pidfile -- is server running?\n";

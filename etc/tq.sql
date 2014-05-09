@@ -23,7 +23,7 @@ create table if not exists `users` (
     CONSTRAINT `users_updated_by_fk` foreign key (updated_by) references users (id)
 ) engine = InnoDB default character set = utf8 collate utf8_bin;
 
-insert into users (guid,pw,name,email,description,created_by,updated_by,type,status) values ('systemuser123456','3ad9c4bf-030d-40f3-b193-bea0849ae6de','SYSTEM','noone@nosuchemail.org','system user', 1, 1, 'A', 'A');
+insert into users (guid,pw,name,email,description,created_by,updated_by,type,status) values ('systemuser123456','ac5249eb51046c7b106208d7f4fecba6923da378c53df280759f9f9ad9ab7f6b','SYSTEM','noone@nosuchemail.org','system user', 1, 1, 'A', 'A');
 SET FOREIGN_KEY_CHECKS = 1;
 
 create table if not exists job_queue (

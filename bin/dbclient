@@ -1,0 +1,107 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Getopt::Long;
+use Pod::Usage;
+use Text::CSV_XS;
+use Term::ANSIColor;
+use Data::Dump qw( dump );
+use Module::Load qw();
+use TQ::Config;
+
+umask(0007);
+
+my $help       = 0;
+my $write_mode = 0;
+my $csv_sql    = 0;
+my $db_name    = 'TQ';
+GetOptions(
+    'help'  => \$help,
+    'write' => \$write_mode,
+    'csv=s' => \$csv_sql,
+    'db=s'  => \$db_name,
+) or pod2usage(2);
+pod2usage(1) if $help;
+
+=pod
+
+=head1 NAME
+
+dbclient - connect to TQ database via mysql client
+
+=head1 SYNOPSIS
+
+ dbclient [opts] [sql]
+    -h --help
+    -w --write
+    -csv="select foo from bar"
+    -db=dbname
+
+=cut
+
+if ( $csv_sql and $write_mode ) {
+    pod2usage("Sorry: cannot use both csv and write modes");
+}
+
+# get parameters
+my $manager_class = $db_name . '::DBManager';
+Module::Load::load($manager_class);
+my $dbh = $manager_class->new();
+$dbh = $dbh->get_write_handle() if ($write_mode);
+
+# in csv mode, just execute and print
+if ($csv_sql) {
+    my $csv = Text::CSV_XS->new( { binary => 1, eol => $/ } );
+    my $dbh = $dbh->retain_dbh;
+    my $sth = $dbh->prepare($csv_sql);
+    $sth->execute();
+
+    # print column headers
+    my $headers = $sth->{NAME};
+    $csv->print( "STDOUT", $headers );
+
+    # print data
+    while ( my $row = $sth->fetchrow_arrayref ) {
+        $csv->print( "STDOUT", $row );
+    }
+    exit;
+}
+
+my $db   = $dbh->database();
+my $dom  = $dbh->domain();
+my $drv  = $dbh->driver();
+my $host = $dbh->host();
+my $pwd  = $dbh->password();
+my $port = $dbh->port();
+my $typ  = $dbh->type();
+my $usr  = $dbh->username();
+
+# banner
+my $COLOR = color("green");
+my $WARN  = color("red");
+
+my $msg = "   CONNECTED TO $db AS $usr\@$host";
+$msg = sprintf( "%-64s", $msg );
+
+print "$COLOR\n";
+print "##################################################################\n";
+print "#                                                                #\n";
+print "#$msg#\n";
+print "#                                                                #\n";
+print
+    "#  $WARN WARNING: WRITE MODE ENABLED!  Please set: 'autocommit=0' $COLOR    #\n"
+    if ($write_mode);
+print "#                                                                #\n"
+    if ($write_mode);
+print "##################################################################\n";
+print "\n" . color("reset");
+
+# run the command
+my $cmd = "mysql --user=$usr --password=$pwd --database=$db --host=$host "
+    . "--auto-rehash --default-character-set=utf8";
+$cmd .= " --port=$port" if $port;
+$cmd .= " --prompt='$dom:$typ> '";
+
+system($cmd) and die "$cmd failed with [$!]";
