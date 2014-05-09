@@ -1,0 +1,299 @@
+#!/usr/bin/env perl
+
+package TQApp;
+local $| = 1;    # do not buffer stdout
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use TQ::Config;
+use Unix::PID::Tiny;
+use IO::Socket;
+use Data::Dump qw( dump );
+use Path::Class;
+
+my $app_root        = TQ::Config::get_app_root();
+my $this_script     = $0;
+my $watcher         = $app_root->file("bin/watch-incoming");
+my $port            = TQ::Config::get_app_port();
+my $workers         = TQ::Config::get_profile_value('app_workers');
+my $debug           = TQ::Config::get_profile_value('app_debug');
+my $pidfile         = $app_root->file("var/tq-${port}.pid");
+my $watcher_pidfile = $app_root->file("var/watch-incoming.pid");
+my $perl            = $^X;
+my $logroot         = TQ::Config::get_log_dir();
+my $logfile         = $logroot->file("tq-${port}.log");
+my $error_logfile   = $logroot->file("tq-${port}-error.log");
+my $watcher_logfile = $logroot->file("watch-incoming-${port}.log");
+my $patience = 10;  # willing to wait this many seconds for action to complete
+my $tq_app = $app_root->file('app/TQApp/tqapp.psgi');
+my $server = "starman -D --port $port --pid=$pidfile $tq_app ";
+
+if ($workers) {
+    $server .= " --workers $workers ";
+}
+
+$pidfile->dir->mkpath();
+$logroot->mkpath();
+
+# turn on debug env
+if ($debug) {
+    $ENV{CATALYST_DEBUG} = 1;
+}
+
+# the signals passed to the process in stop(), in the order we try them.
+# NOTE that 15 (TERM) is not used because it does not always kill off forked
+# child processes.
+my $HUP          = 1;
+my @kill_signals = (
+    $HUP,    # HUP
+    2,       # INT
+    $HUP,    # HUP
+    9,       # KILL
+);
+
+my $action = shift(@ARGV);
+if ( !$action ) {
+    help();
+    exit(0);
+}
+
+if ( __PACKAGE__->can($action) ) {
+    __PACKAGE__->$action();
+}
+else {
+    help();
+    exit(1);
+}
+
+sub start {
+    start_server();
+    start_watcher();
+}
+
+sub stop {
+    stop_watcher();
+    stop_server();
+}
+
+sub check {
+    check_watcher();
+    check_server();
+}
+
+sub reload {
+    reload_server();
+    restart_watcher();    # no reload available
+}
+
+sub start_watcher {
+    my $cmd
+        = "nohup $perl $watcher --default --pid_file=$watcher_pidfile 1>>$watcher_logfile 2>>$watcher_logfile &";
+    print "Starting $watcher ...";
+    if ( -s $watcher_pidfile ) {
+        print
+            "Found PID file at $watcher_pidfile -- is server already running?\n";
+        exit(2);
+    }
+    system($cmd);
+    my $now = time();
+    while ( !-s $watcher_pidfile ) {
+        if ( time() - $now > $patience ) {
+            last;
+        }
+        print ".";
+        sleep 1;
+    }
+    if ( -s $watcher_pidfile ) {
+        print " ok\n";
+        return 1;
+    }
+    else {
+        print " failed\n";
+        return 0;
+    }
+}
+
+sub stop_watcher {
+    print "Stopping $watcher ...";
+    if ( !-s $watcher_pidfile ) {
+        print "No PID file found at $watcher_pidfile -- is server running?\n";
+        exit(2);
+    }
+    my $pid      = `cat $watcher_pidfile`;
+    my $unix_pid = Unix::PID::Tiny->new;
+    my @signals  = @kill_signals;
+    if ( $unix_pid->is_pid_running($pid) ) {
+        mykill( $signals[0], $pid );
+    }
+    my $now = time();
+    while ( $unix_pid->is_pid_running($pid) ) {
+        mykill( shift(@signals) || 9, $pid );
+        if ( time() - $now > $patience ) {
+            last;
+        }
+        print ".";
+        sleep 1;
+    }
+    if ( $unix_pid->is_pid_running($pid) ) {
+        print " failed to kill PID $pid\n";
+        exit(3);
+    }
+    print " ok\n";
+    unlink $watcher_pidfile;
+    return 1;
+}
+
+sub start_server {
+    my $cmd      = "$server --access-log=$logfile --error-log=$error_logfile";
+    my $friendly = $cmd;
+    $friendly =~ s/--/\\\n  --/g;
+    print "Starting server: $friendly\n ...";
+    if ( -s $pidfile ) {
+        print "Found PID file at $pidfile -- is server already running?\n";
+        exit(2);
+    }
+    system($cmd);
+    my $now = time();
+    while ( !-s $pidfile ) {
+        if ( time() - $now > $patience ) {
+            last;
+        }
+        print ".";
+        sleep 1;
+    }
+    if ( -s $pidfile ) {
+        print " ok\n";
+        return 1;
+    }
+    else {
+        print " failed\n";
+        return 0;
+    }
+}
+
+sub reload_server {
+    if ( !-s $pidfile ) {
+        print "Server is not running.\n";
+        exit(2);
+    }
+    chomp( my $pid = `cat $pidfile` );
+    my $unix_pid = Unix::PID::Tiny->new;
+    if ( $unix_pid->is_pid_running($pid) ) {
+        print "Sending HUP to master process $pid... ";
+        mykill( $HUP, $pid );
+        print " ok\n";
+    }
+    else {
+        print "PID $pid is not running.\n";
+        exit(2);
+    }
+}
+
+sub stop_server {
+    print "Stopping server ...";
+    if ( !-s $pidfile ) {
+        print "No PID file found at $pidfile -- is server running?\n";
+        exit(2);
+    }
+    chomp( my $pid = `cat $pidfile` );
+    my $unix_pid = Unix::PID::Tiny->new;
+    my @signals  = @kill_signals;
+    if ( $unix_pid->is_pid_running($pid) ) {
+        mykill( $signals[0], $pid );
+    }
+    my $now = time();
+    while ( $unix_pid->is_pid_running($pid) ) {
+        mykill( shift(@signals), $pid );
+        if ( time() - $now > $patience ) {
+            last;
+        }
+        print ".";
+        sleep 1;
+    }
+    if ( $unix_pid->is_pid_running($pid) ) {
+        print " failed to kill PID $pid\n";
+        exit(3);
+    }
+    print " ok\n";
+    unlink $pidfile;
+    return 1;
+}
+
+sub restart_watcher {
+    stop_watcher();
+    start_watcher();
+}
+
+sub restart_server {
+    stop_server();
+    start_server();
+}
+
+sub restart {
+    stop();
+    my $max = 10;
+    my $i   = 0;
+    while ( port_is_open() ) {
+        print "Waiting for port $port to close...\n";
+        sleep 1;
+        last if ( $i++ > $max );
+    }
+    start();
+}
+
+sub port_is_open {
+    return IO::Socket::INET->new(
+        PeerAddr => '127.0.0.1',
+        PeerPort => $port,
+        Proto    => 'tcp',
+        Type     => SOCK_STREAM,
+    );
+}
+
+sub check_server {
+    chomp( my $pid = `cat $pidfile` );
+    if ( !$pid ) {
+        print "No search_server running (no PID at $pidfile)\n";
+        return 0;
+    }
+    my $unix_pid = Unix::PID::Tiny->new;
+    if ( $unix_pid->is_pid_running($pid) ) {
+        print "Found running PID for $pid in $pidfile\n";
+        return 1;
+    }
+    else {
+        print "Found stale search_server PID file at $pidfile\n";
+        return 0;
+    }
+}
+
+sub check_watcher {
+    chomp( my $pid = `cat $watcher_pidfile` );
+    if ( !$pid ) {
+        print "No watcher running (no PID at $watcher_pidfile)\n";
+        return 0;
+    }
+    my $unix_pid = Unix::PID::Tiny->new;
+    if ( $unix_pid->is_pid_running($pid) ) {
+        print "Found running PID for $pid in $watcher_pidfile\n";
+        return 1;
+    }
+    else {
+        print "Found stale watcher PID file at $watcher_pidfile\n";
+        return 0;
+    }
+}
+
+sub help {
+    print "$this_script [ start | stop | restart | check | help ]\n";
+}
+
+sub mykill {
+    my ( $signal, $pid ) = @_;
+
+    #print "kill -$signal $pid\n";
+    #kill( $signal, $pid ) and warn "kill $signal $pid returned true";
+
+    kill( $signal, $pid );
+}
