@@ -24,5 +24,5 @@ $template->process(
     },
     \$buf
 ) or die $template->error();
-my $htaccess = Barn::Config::get_app_root->file('app/public_html/.htaccess');
+my $htaccess = TQ::Config::get_app_root->file('app/public_html/.htaccess');
 $htaccess->spew($buf);

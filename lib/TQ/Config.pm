@@ -27,7 +27,8 @@ if ( -s $version_file ) {
 }
 
 # set the global app timezone based on $hostname config
-our $TIMEZONE = $profiles->val( $profile, 'server_time_zone' );
+our $TIMEZONE   = $profiles->val( $profile, 'server_time_zone' );
+our $SERVER_URI = $profiles->val( $profile, 'server_base_uri' );
 
 ##############
 # methods
@@ -54,6 +55,10 @@ sub get_datetime_format {'%FT%T%z'}                                 # ISO8601
 sub get_profiles        { return $profiles }
 sub get_user            { return $user }
 sub get_pid             {$$}
+
+sub get_server_base_uri {
+    return $SERVER_URI;
+}
 
 sub get_app_root {
     return $path_to_this_pm->dir->absolute->parent->parent;
