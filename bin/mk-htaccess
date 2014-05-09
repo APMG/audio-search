@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Carp;
+use Data::Dump qw( dump );
+use TQ::Config;
+use File::Slurp;
+use Template;
+use URI;
+
+my $app_base_uri    = TQ::Config::get_app_base_uri();
+my $server_base_uri = URI->new( TQ::Config::get_server_base_uri() );
+my $template        = Template->new(
+    { INCLUDE_PATH => TQ::Config::get_app_root->subdir('etc') . "" } );
+my $buf;
+$template->process(
+    'htaccess.tmpl',
+    {   server_base_uri      => $server_base_uri,
+        app_base_uri         => $app_base_uri,
+        server_base_uri_path => $server_base_uri->path,
+    },
+    \$buf
+) or die $template->error();
+my $htaccess = Barn::Config::get_app_root->file('app/public_html/.htaccess');
+$htaccess->spew($buf);
