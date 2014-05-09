@@ -36,11 +36,11 @@ __PACKAGE__->meta->setup(
     alias_column => [qw( pw local_password )],
 
     foreign_keys => [
-        created_owner => {
+        created_user => {
             class       => 'TQ::User',
             key_columns => { created_by => 'id' },
         },
-        updated_owner => {
+        updated_user => {
             class       => 'TQ::User',
             key_columns => { updated_by => 'id' },
         },
