@@ -16,12 +16,12 @@ for line in mlfFile:
     print "{\n  \"words\": ["
     while line.rstrip("\n") != ".":
       print "    {"
-      startTime = float(line.split('\t')[0])
-      endTime = float(line.split('\t')[1])
-      word = line.rstrip("\n").split('\t')[2]
+      startTime = float(re.split('\t| ', line)[0])
+      endTime = float(re.split('\t| ', line)[1])
+      word = re.split('\t| ', line)[2]
       print "      \"time\": \""+ str(startTime/scale) +"\","
       print "      \"duration\": \""+ str((endTime-startTime)/scale) +"\","
-      print "      \"word\": \""+ word +"\""
+      print "      \"word\": \""+ word.strip("\"") +"\""
       line = mlfFile.next()
       if line.rstrip("\n") != ".": print "    },"
       else: print "    }"

@@ -1,9 +1,15 @@
-This is an initial release of an Automatic Speech Recognition system built by Cantab Research for APM. 
+This is the second release of an Automatic Speech Recognition system built by Cantab Research for APM. 
 
-It uses the Julius decoder, and is executed with the script cantabAPM.sh as follows: 
-./cantabAPM.sh <wavFile> <outputFile>
-where <wavFile> is the audio file to be recognised and <outputFile> is the output JSON file of the recognised text.
+It uses the Julius decoder, which is downloaded and installed using:
+./install.sh
+
+The speech recognition system is executed with the script cantabAPM.sh as follows: 
+./cantabAPM.sh <wavFile> <jsonFile>
+where <wavFile> is the audio file to be recognised and <jsonFile> is the output JSON file of the recognised text.
+
+The recognition runs on four cores; this can be adjusted in scripts/qq.sh, in the line: local npart=4
+It also includes the option of running on gridEngine, if it is installed and the variable SGE_ROOT has been set.
 
 For more information, email info@cantabresearch.com
 Cantab Research Ltd.
-17 April 2014
+07 May 2014

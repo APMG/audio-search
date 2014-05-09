@@ -6,7 +6,6 @@
 $scale = 10000000;
 
 open(DBL, $ARGV[0]) || die "did't open $ARGV[0]\n";
-
 $keep = $/;
 undef $/;
 open(MLF, $ARGV[1]) || die "did't open $ARGV[1]\n";
@@ -19,7 +18,6 @@ while($mlf =~ m/input speechfile: (.*?)\.wav\n.*?\n ----------------------------
   #print "$1\n";
   #print "$2\n";
 }
-
 print "#!MLF!#\n";
 undef $base;
 while($dbl = <DBL>) {
@@ -33,12 +31,18 @@ while($dbl = <DBL>) {
     }
     print "\"$stem.rec\"\n";
   }
+  #if ($hash{$dbl} =~ m/^cmscore1:(.*?)\n/gs) { 
+  #  print "Here";
+  #  our @confidences = split($1);
+  #  print $confidences;
+  #}
   # while($hash{$dbl} =~ m/\[ *(\d+) +(\d+)\] +.*? +(.*?) +\[.*?\]/gs) {
   # while($hash{$dbl} =~ m/\[ *(\d+) +(\d+)\].*? +(.*?) +\[/gs) {
+
   while($hash{$dbl} =~ m/\[ *(\d+) +(\d+)\].*? +(.*?)  (.*?)\t/gs) {
     $init = $scale * ($offset + 0.01 * $1);
     $quit = $scale * ($offset + 0.01 * ($2 + 1));
-    print "$init\t$quit\t$4\n";
+    print "$init\t$quit\t$4\t\n";
   }
 
   $base = $stem;

@@ -197,10 +197,8 @@
 ####
 #-d binary_ngram_file		# N-gram in Julius binary format
 #-nlr ngram			# forward (left-to-right) N-gram
--nlr /cantab/dev/en-GB-am/wsjcam0.lm2-julius
 #-nrl rev_ngram			# backward (right-to-left) N-gram
 #-v dictfile			# word dictionary
--v /cantab/dev/en-GB-am/13Jan12WIa/wsjcam0.dct-htk
 ## param.
 #-silhead "<s>"			# beginning-of-sentence (silence) word
 #-siltail "</s>"		# end-of-sentence (silence) word
@@ -254,9 +252,7 @@
 
 ## Acoustic model
 #-h hmmfile			# acoustic HMM (ascii or Julius binary)
--h      /cantab/dev/en-GB-am/13Jan12XWa/hlda16g.mmf
 #-hlist logicaltri		# HMMList to map logical phone to physical
--hlist  /cantab/dev/en-GB-am/13Jan12XWa/tiedlist
 #-tmix 2			# # of mixture to compute in a mixture PDF
 #-spmodel "sp"			# name of a short-pause silence model
 -multipath			# force enable MULTI-PATH model handling
@@ -342,7 +338,6 @@
 -bs 80.0
 #-bs score                      # beam width (score)
 #-nlimit 3			# with enable-wpair-nlimit, set max N at nodes
-#-nlimit 8
 #-progout			# progressive output while decoding
 #-proginterval 300		# output interval in msec for "-progout"
 
