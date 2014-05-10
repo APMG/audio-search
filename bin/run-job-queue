@@ -1,0 +1,64 @@
+#!/usr/bin/env perl 
+
+# check the job_queue table and run unlocked jobs
+
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Carp;
+use Data::Dump qw( dump );
+use Getopt::Long;
+use Pod::Usage;
+use DateTime;
+use TQ::Config;
+use TQ::JobQueue;
+use TQ::Utils qw( logger parse_date );
+
+# ALWAYS use the master connection
+$ENV{TQ_USE_MASTER} = 1;
+
+umask(0007);    # group rw, world null
+
+# if any are locked, just exit
+# since we do not want concurrent jobs running.
+# TODO this may change if we ever move to a clustered
+# queue via (e.g.) Gearman
+my $locked = TQ::JobQueue->get_locked();
+if ( scalar(@$locked) ) {
+
+    # find oldest and complain if older than an hour,
+    # in case whole queue is stuck
+    my $oldest;
+    for my $j (@$locked) {
+        $oldest ||= $j;
+        if ( $oldest->start_dtim->epoch < $j->start_dtim->epoch ) {
+            $oldest = $j;
+        }
+    }
+
+    my $now = parse_date('now');
+
+    # only warn once-an-hour
+    if (    $now->minute == 0
+        and $oldest->start_dtim->epoch < ( time() - 3600 ) )
+    {
+        warn "Job Queue has been locked since " . $oldest->start_dtim;
+    }
+
+    exit(0);
+}
+
+my $queued = TQ::JobQueue->get_queued_with_locks();
+
+for my $job (@$queued) {
+    if ( !$job->run() ) {
+        logger(
+            sprintf(
+                "FAIL: job id %s with error msg: %s\n",
+                $job->id, $job->error_msg
+            )
+        );
+    }
+}
+
