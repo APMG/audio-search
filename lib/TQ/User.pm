@@ -52,6 +52,12 @@ __PACKAGE__->meta->setup(
             column_map => { id => 'user_id' },
             type       => 'one to many',
         },
+        jobs => {
+            class      => 'TQ::JobQueue',
+            column_map => { id => 'xid' },
+            type       => 'one to many',
+            query_args => [ type => 'U' ],
+        },
     ],
 );
 
