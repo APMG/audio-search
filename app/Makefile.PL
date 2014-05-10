@@ -25,7 +25,7 @@ requires 'Catalyst::Plugin::Authentication';
 requires 'Catalyst::Plugin::Static::Simple::ByClass';
 requires 'Catalyst::Authentication::AuthTkt';
 requires 'CatalystX::CRUD'                   => '0.56';
-requires 'CatalystX::CRUD::Model::RDBO'      => '0.30';
+requires 'CatalystX::CRUD::Model::RDBO'      => '0.301';
 requires 'Catalyst::Controller::REST'        => 0;
 requires 'CatalystX::CRUD::Controller::REST' => 0;
 requires 'Moose';
