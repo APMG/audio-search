@@ -1,6 +1,7 @@
 package TQApp::Base::RedactedObject;
 use Moose;
 extends 'CatalystX::CRUD::Object::RDBO';
+use TQ::Utils qw( parse_date );
 
 # some attributes we want to hide
 
@@ -12,6 +13,14 @@ around 'serialize' => sub {
     for my $attr (@redacted) {
         delete $hashref->{$attr} if exists $hashref->{$attr};
     }
+
+    # make sure datetime stringifys as iso8601 with timezone
+    for my $dtcol (qw( created_at updated_at )) {
+        if ( exists $hashref->{$dtcol} ) {
+            $hashref->{$dtcol} = parse_date( $hashref->{$dtcol} ) . "";
+        }
+    }
+
     return $hashref;
 };
 

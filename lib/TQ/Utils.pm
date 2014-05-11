@@ -104,7 +104,7 @@ sub parse_date {
 
 =head2 format_date( I<datetime> )
 
-Returns a string for I<datetime> using TQ::Config::get_pubdtim_format()
+Returns a string for I<datetime> using TQ::Config::get_datetime_format()
 and TQ::Config::get_tz().
 
 =cut
@@ -114,11 +114,26 @@ sub format_date {
         shift(@_);
     }
     my $dt = shift;
-    if ( !$dt or !$dt->isa('DateTime') ) {
+    if ( !defined($dt) or !$dt->isa('DateTime') ) {
         confess "DateTime object required";
     }
     $dt->set_time_zone( TQ::Config::get_tz() );
-    return $dt->strftime( TQ::Config::get_pubdtim_format() );
+    return $dt->strftime( TQ::Config::get_datetime_format() );
+}
+
+# monkey-patch datetime alas DateTimeX::TO_JSON
+{
+    no warnings;
+
+    sub DateTime::TO_JSON {
+        my $dt = shift;
+        return format_date($dt);
+    }
+
+    sub DateTime::_stringify {
+        my $dt = shift;
+        return format_date($dt);
+    }
 }
 
 1;

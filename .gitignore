@@ -1,2 +1,3 @@
 var/
 app/public_html/.htaccess
+etc/profiles.ini
