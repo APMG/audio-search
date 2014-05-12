@@ -82,4 +82,16 @@ sub get_log_dir {
     return dir($log_dir);
 }
 
+sub get_audio_store_path {
+    my $p = get_profile_value('audio_store_path');
+    $p ||= '/var/extra/audio/store';
+    return dir($p);
+}
+
+sub get_audio_json_path {
+    my $p = get_profile_value('audio_json_path');
+    $p ||= '/var/extra/audio/json';
+    return dir($p);
+}
+
 1;
