@@ -67,6 +67,7 @@ requires "Term::ProgressBar::Simple";
 requires "Text::CSV_XS";
 requires "Try::Tiny";
 requires "Unix::PID::Tiny" => 0.9;
+requires "UUID::Tiny";
 
 perl_version '5.8.9';
 license 'MIT';
