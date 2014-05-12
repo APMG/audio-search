@@ -14,9 +14,19 @@ is( $db_master->type, 'master', "master db type" );
 $db_slave->logger('ima slave');
 $db_master->logger('ima master');
 
-# test slave failure auto-rollover to master
-$ENV{TQ_USE_MASTER} = 0;
-ok( my $db = TQ::DBManager->new_or_cached( domain => 'master_slave_test' ),
-    "get db handle for non-existent slave" );
-$db->logger('ima master posing as slave');
-is( $db->host, 'localhost', "got master domain" );
+SKIP: {
+
+    if ( !$ENV{TQ_TEST_DB} ) {
+        skip "set TQ_TEST_DB to test replication failover", 2;
+    }
+
+    # test slave failure auto-rollover to master
+    $ENV{TQ_USE_MASTER} = 0;
+    ok( my $db
+            = TQ::DBManager->new_or_cached( domain => 'master_slave_test' ),
+        "get db handle for non-existent slave"
+    );
+    $db->logger('ima master posing as slave');
+    is( $db->host, 'localhost', "got master domain" );
+
+}
