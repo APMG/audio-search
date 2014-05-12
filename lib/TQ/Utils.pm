@@ -6,6 +6,7 @@ use Carp;
 use Digest::SHA qw( sha256_hex );
 use DateTime::Format::DateParse;
 use Rose::DateTime::Util ();
+use Path::Class;
 
 use base 'Exporter';
 our @EXPORT_OK = qw( logger parse_date random_str encrypt );
@@ -134,6 +135,30 @@ sub format_date {
         my $dt = shift;
         return format_date($dt);
     }
+}
+
+=head2 seg_path_for( I<pk>, I<base_dir> [,I<depth>] )
+
+Returns a Path::Class::Dir object relative to I<base_dir>
+segmented based on the first 2 chars in I<pk>.
+
+Optional I<depth> should be an integer indicating number
+of levels of segmentation to apply. Default is 2.
+
+=cut
+
+sub seg_path_for {
+    my $pk       = shift;
+    my $base_dir = dir(shift);
+    my $depth    = shift || 2;
+    my @chars    = split( //, $pk );
+    my @levels;
+    while ( @chars and @levels < $depth ) {
+        my $char = shift @chars;
+        next unless $char =~ m/^\w$/;
+        push @levels, $char;
+    }
+    return $base_dir->subdir(@levels);
 }
 
 1;
