@@ -51,4 +51,9 @@ sub insert {
     $self->SUPER::insert();
 }
 
+sub primary_key_uri_escaped {
+    my $self = shift;
+    return $self->uuid;
+}
+
 1;
