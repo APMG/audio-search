@@ -5,6 +5,7 @@ use base qw( TQ::DB );
 use Carp;
 use IPC::Cmd ();
 use TQ::Config;
+use UUID::Tiny ':std';
 
 __PACKAGE__->meta->setup(
     table => 'job_queue',
@@ -15,18 +16,20 @@ __PACKAGE__->meta->setup(
         pid  => { type => 'integer', },
         cmd       => { type => 'text', not_null => 1, length => 65535 },
         error_msg => { type => 'text', length   => 65535, },
-        type          => { type => 'character', length   => 1, },
-        xid           => { type => 'integer', },
+        type => { type => 'character', length => 1, },
+        xid  => { type => 'integer', },
+        uuid => { type => 'char', length => 36, not_null => 1 },
         schedule_dtim => { type => 'datetime', },
         start_dtim    => { type => 'datetime' },
         complete_dtim => { type => 'datetime' },
-        created_by    => { type => 'integer',   not_null => 1 },
-        updated_by    => { type => 'integer',   not_null => 1 },
-        created_at    => { type => 'datetime',  not_null => 1 },
-        updated_at    => { type => 'datetime',  not_null => 1 },
+        created_by    => { type => 'integer', not_null => 1 },
+        updated_by    => { type => 'integer', not_null => 1 },
+        created_at    => { type => 'datetime', not_null => 1 },
+        updated_at    => { type => 'datetime', not_null => 1 },
     ],
 
     primary_key_columns => ['id'],
+    unique_keys         => [ ['uuid'] ],
 
     foreign_keys => [
         created_user => {
@@ -40,6 +43,17 @@ __PACKAGE__->meta->setup(
     ],
 
 );
+
+sub insert {
+    my $self = shift;
+    $self->uuid( lc( create_uuid_as_string(UUID_V4) ) ) unless $self->uuid;
+    $self->SUPER::insert();
+}
+
+sub primary_key_uri_escaped {
+    my $self = shift;
+    return $self->uuid;
+}
 
 =head2 add_job( I<cmd>[, I<start_after>] )
 

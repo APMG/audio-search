@@ -38,10 +38,12 @@ create table if not exists job_queue (
     error_msg       text,
     type            char(1),
     xid             integer,
+    uuid            char(36) not null,
     schedule_dtim   datetime,
     start_dtim      datetime,
     complete_dtim   datetime,
     PRIMARY KEY (`id`),
+    UNIQUE KEY (`uuid`),
     CONSTRAINT `job_queue_created_by_fk` foreign key (created_by) references users (id),
     CONSTRAINT `job_queue_updated_by_fk` foreign key (updated_by) references users (id)
 ) engine = InnoDB default character set = utf8 collate utf8_bin;
@@ -57,7 +59,9 @@ create table if not exists scheduled_jobs (
     description     text,
     crontab         varchar(255),  -- schedule syntax
     cmd             text,          -- must be relative to APP/bin
+    uuid            char(36) not null,
     PRIMARY KEY (`id`),
+    UNIQUE KEY (`uuid`),
     CONSTRAINT `scheduled_job_created_by_fk` foreign key (created_by) references users (id),
     CONSTRAINT `scheduled_job_updated_by_fk` foreign key (updated_by) references users (id)
 ) engine = InnoDB default character set = utf8 collate utf8_bin;
@@ -75,6 +79,7 @@ create table if not exists media (
     uuid            char(36) not null,
     user_id         integer not null,
     PRIMARY KEY (`id`),
+    UNIQUE KEY (`uuid`),
     CONSTRAINT `media_user_fk` foreign key (user_id) references users (id),
     CONSTRAINT `media_created_by_fk` foreign key (created_by) references users (id),
     CONSTRAINT `media_updated_by_fk` foreign key (updated_by) references users (id)

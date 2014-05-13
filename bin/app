@@ -38,7 +38,7 @@ $logroot->mkpath();
 
 # turn on debug env
 if ($debug) {
-    $ENV{CATALYST_DEBUG} = 1;
+    $ENV{CATALYST_DEBUG} ||= 1;
 }
 
 # the signals passed to the process in stop(), in the order we try them.

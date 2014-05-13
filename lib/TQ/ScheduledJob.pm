@@ -4,12 +4,14 @@ use warnings;
 use base qw( TQ::DB );
 use Carp;
 use TQ::Config;
+use UUID::Tiny ':std';
 
 __PACKAGE__->meta->setup(
     table => 'scheduled_jobs',
 
     columns => [
-        id     => { type => 'serial', not_null => 1 },
+        id   => { type => 'serial', not_null => 1 },
+        uuid => { type => 'char',   length   => 36, not_null => 1 },
         status => {
             type     => 'character',
             length   => 1,
@@ -75,5 +77,16 @@ __PACKAGE__->meta->setup(
     ],
 
 );
+
+sub insert {
+    my $self = shift;
+    $self->uuid( lc( create_uuid_as_string(UUID_V4) ) ) unless $self->uuid;
+    $self->SUPER::insert();
+}
+
+sub primary_key_uri_escaped {
+    my $self = shift;
+    return $self->uuid;
+}
 
 1;
