@@ -7,6 +7,8 @@ use Digest::SHA qw( sha256_hex );
 use DateTime::Format::DateParse;
 use Rose::DateTime::Util ();
 use Path::Class;
+use Lingua::EN::Tagger;
+use Search::Tools::Transliterate;
 
 use base 'Exporter';
 our @EXPORT_OK = qw( logger parse_date random_str encrypt );
@@ -206,6 +208,42 @@ sub ms2hms {
     my $min   = int( $rm / 60 );
     my $sec   = $rm % 60;
     return sprintf( "%02d:%02d:%02d", $hours, $min, $sec );
+}
+
+my $tagger = Lingua::EN::Tagger->new(
+    lc                  => 1,
+    longest_noun_phrase => 5,
+    weight_noun_phrases => 0,
+);
+my $asciifier = Search::Tools::Transliterate->new( ebit => 0 );
+
+sub extract_keywords {
+    my ($buf) = @_;
+
+    # deal only with ascii
+    $buf = $asciifier->convert($buf);
+
+    # remove any meta markup
+    $buf =~ s/#speaker .+?\n//sg;
+
+    # ignore punctuation
+    $buf =~ s/[\.\?\!\,\;\:]//g;
+
+    # tagger
+    my $tagged = $tagger->add_tags($buf);
+    my %nouns  = $tagger->get_noun_phrases($tagged);
+
+    # reduce some parsing noise
+    delete $nouns{"'s"};
+    for my $k ( keys %nouns ) {
+        if ( length $k == 1 ) {
+            delete $nouns{$k};
+        }
+    }
+
+    #dump \%nouns;
+    return [ sort { $nouns{$b} <=> $nouns{$a} } keys %nouns ];
+
 }
 
 1;

@@ -10,6 +10,7 @@ use TQ::Utils;
 use LWP::UserAgent;
 use Audio::Scan;
 use JSON;
+use Text::Wrap;
 
 __PACKAGE__->meta->setup(
     table   => 'media',
@@ -142,6 +143,36 @@ sub get_file {
         }
     }
     return $file;
+}
+
+sub transcript_as_text {
+    my $self        = shift;
+    my $decoded     = decode_json( $self->transcript );
+    my $words_array = $decoded->{words};
+    my @buf         = ();
+    my @section     = ();
+    for my $tok (@$words_array) {
+        my $word = $tok->{word};
+        if ( $word eq '<s>' ) {
+            @section = ();
+        }
+        elsif ( $word eq '</s>' ) {
+            push @buf, join( ' ', @section );
+        }
+        else {
+            push @section, $word;
+        }
+    }
+
+    #dump \@buf;
+
+    return sprintf( "%s\n", wrap( '', '', @buf ) );
+}
+
+sub keywords {
+    my $self = shift;
+    my $text = $self->transcript_as_text;
+    return TQ::Utils::extract_keywords( $text );
 }
 
 1;

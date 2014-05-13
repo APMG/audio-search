@@ -5,7 +5,7 @@ use TQ::Utils qw( parse_date );
 
 # some attributes we want to hide
 
-my @redacted = qw( id pw created_by updated_by );
+my @redacted = qw( id pw created_by updated_by user_id xid );
 
 around 'serialize' => sub {
     my ( $super_method, $self ) = @_;

@@ -47,7 +47,7 @@ __PACKAGE__->meta->setup(
     ],
 
     relationships => [
-        medias => {
+        media => {
             class      => 'TQ::Media',
             column_map => { id => 'user_id' },
             type       => 'one to many',
