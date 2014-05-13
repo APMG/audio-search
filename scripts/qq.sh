@@ -10,7 +10,7 @@ qqSplit() {
   if [ ! -z "$SGE_ROOT" ] ; then
     local npart=40  # splits into no more than this number of jobs
   else
-    local npart=4   # EDIT THIS - assumes a quad core machine
+    local npart=8   # EDIT THIS - assumes a quad core machine
   fi
 
   if [ $1 = '-npart' ] ; then
