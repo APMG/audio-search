@@ -5,6 +5,11 @@ use base qw( TQ::DB );
 use Carp;
 use Data::Dump qw( dump );
 use UUID::Tiny ':std';
+use TQ::Config;
+use TQ::Utils;
+use LWP::UserAgent;
+use Audio::Scan;
+use JSON;
 
 __PACKAGE__->meta->setup(
     table   => 'media',
@@ -54,6 +59,89 @@ sub insert {
 sub primary_key_uri_escaped {
     my $self = shift;
     return $self->uuid;
+}
+
+sub transcribe {
+    my $self = shift;
+    my %args = @_;
+
+    my $converter = delete $args{converter} or confess "converter required";
+    my $file     = delete $args{file}  || $self->get_file;
+    my $jsonfile = delete $args{json}  || $self->get_json_file;
+    my $debug    = delete $args{debug} || 0;
+
+    # we require 16k wav format. make sure we have it.
+    # Audio::Scan relies on file extension so we do too.
+    my ( $base, $ext ) = ( $file =~ m/^(.+)\.(\w+)$/ );
+    my $scan = Audio::Scan->scan_info($file);
+    $debug and warn dump $scan->{info};
+    $debug and warn sprintf( "length: %s\n",
+        TQ::Utils::ms2hms( $scan->{info}->{song_length_ms} ) );
+    my $wav16k;
+    if ( $scan->{info}->{samplerate} == 16000 ) {
+        $wav16k = $file;
+    }
+    elsif ( lc $ext eq 'mp3' ) {
+        TQ::Utils::run_it("lame --decode $file $base.wav");
+        TQ::Utils::run_it("sox $base.wav -r16k $base-16k.wav");
+        $wav16k = "$base-16k.wav";
+    }
+    elsif ( lc $ext eq 'wav' ) {
+        TQ::Utils::run_it("sox $file -r16k $base-16k.wav");
+        $wav16k = "$base-16k.wav";
+    }
+    else {
+        confess "Failed to create 16k wav file from $file";
+    }
+
+    $jsonfile->parent->mkpath;
+
+    my $start = time();
+    my $out   = TQ::Utils::run_it("$converter $wav16k $jsonfile");
+    my $end   = time();
+    $debug
+        and warn
+        sprintf( "elapsed: %s\n", TQ::Utils::secs2hms( $end - $start ) );
+    $debug and warn sprintf( "%s\n", join( "", @$out ) );
+
+    return $jsonfile->slurp;
+}
+
+sub get_json_file {
+    my $self    = shift;
+    my $jsondir = TQ::Utils::seg_path_for( $self->uuid,
+        TQ::Config::get_audio_json_path(), 4 );
+    return $jsondir->file( $self->uuid . '.json' );
+}
+
+sub get_file {
+    my $self = shift;
+    my $force = shift || 0;
+
+    my $uri = $self->uri;
+    my $file;
+    if ( -s $uri ) {
+        $file = $uri;
+    }
+    else {
+        # fetch and normalize
+        my ($ext) = ( $uri =~ m/\.(\w+)$/ );
+        my $ua    = LWP::UserAgent->new();
+        my $dir   = TQ::Utils::seg_path_for( $self->uuid,
+            TQ::Config::get_audio_store_path(), 4 );
+        $dir->mkpath;
+        $file = $dir->file( $self->uuid . '.' . $ext );
+        if ( -s $file and !$force ) {
+
+            # already there
+        }
+        else {
+            # fetch it
+            my $resp = $ua->mirror( "$uri", "$file" );
+            printf( "Mirror: %s\n%s\n", $uri, $resp->headers->as_string );
+        }
+    }
+    return $file;
 }
 
 1;

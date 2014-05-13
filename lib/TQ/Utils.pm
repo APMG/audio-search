@@ -161,4 +161,51 @@ sub seg_path_for {
     return $base_dir->subdir(@levels);
 }
 
+=head2 secs2hms( I<seconds> )
+
+Converts I<seconds> to hh:mm:ss string.
+
+=cut
+
+sub secs2hms {
+    my $secs  = shift || 0;
+    my $hours = int( $secs / 3600 );
+    my $rm    = $secs % 3600;
+    my $min   = int( $rm / 60 );
+    my $sec   = $rm % 60;
+    return sprintf( "%02d:%02d:%02d", $hours, $min, $sec );
+}
+
+=head2 hms2secs( I<hh:mm::ss> )
+
+Converts I<hh:mm:ss> to seconds.
+
+=cut
+
+sub hms2secs {
+    my $hhmmss = shift || return 0;
+    my ( $h, $m, $s ) = split( /:/, $hhmmss );
+    my $secs = 0;
+    $secs += $s;
+    $secs += ( $m * 60 );
+    $secs += ( $h * 3600 );
+    return $secs;
+}
+
+=head2 ms2hms( I<milliseconds> )
+
+Returns I<hh:mm::ss>.
+
+=cut
+
+sub ms2hms {
+    my $ms    = shift;
+    my $secs  = int( $ms / 1000 );
+    my $hours = int( $secs / 3600 );
+    my $rm    = $secs % 3600;
+    my $min   = int( $rm / 60 );
+    my $sec   = $rm % 60;
+    return sprintf( "%02d:%02d:%02d", $hours, $min, $sec );
+}
+
 1;

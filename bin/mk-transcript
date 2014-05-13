@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Carp;
+use Data::Dump qw( dump );
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use TQ::Media;
+use JSON;
+use Getopt::Long;
+use Pod::Usage;
+
+my $converter = "$FindBin::Bin/../cantabAPM.sh";
+my $help      = 0;
+my $force     = 0;
+my $debug     = 0;
+GetOptions(
+    'help'        => \$help,
+    'converter=s' => \$converter,
+    'force'       => \$force,
+    'debug'       => \$debug,
+) or pod2usage(2);
+pod2usage(1) if $help;
+
+my $media_id = shift(@ARGV) or die "$0 media_id";
+
+my $media = TQ::Media->new( id => $media_id )->load;
+my $json = $media->transcribe(
+    converter => $converter,
+    debug     => $debug,
+    force     => $force,
+);
+if ( $json and decode_json($json) ) {
+    $media->transcript($json);
+    $media->save();
+}
+else {
+    die sprintf( "Failed to create JSON transcript for: %s\n", $media->uri );
+}
+
+exit(0);
+
