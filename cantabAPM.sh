@@ -34,7 +34,7 @@ mkdir -p $WORK
 # Runs CMUseg:
 echo "Running audio segmentation"
 #ffmpeg -i "$INPUT" -ar 16000 -ac 1 $WORK/$wavName.wav < /dev/null 2> /dev/null
-sox $INPUT -r 16k $WORK/$wavName.wav
+#sox $INPUT -r 16k $WORK/$wavName.wav
 echo $wavName | perl -pe "s:^:$WORK/tmp-rec/:" | perl -pe 's:^(.*)/.*$:$1:' | sort -u | xargs --no-run-if-empty mkdir -p
 
 rm -f $WORK/splitFiles.dbl
