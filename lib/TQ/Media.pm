@@ -77,11 +77,12 @@ sub save {
 sub create_job {
     my $self = shift;
     my $id   = $self->id or confess "must have id set to create job";
+    my $uuid = $self->uuid or confess "must have uuid to create job";
     my $job  = TQ::JobQueue->new(
         xid        => $id,
         type       => 'M',
         created_by => $self->user_id,
-        cmd        => qq/mk-transcript $id/,
+        cmd        => qq/mk-transcript $uuid/,
     );
     $job->save();
 }
