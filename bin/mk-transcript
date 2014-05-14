@@ -29,6 +29,7 @@ my $media_id = shift(@ARGV) or die "$0 media_id";
 my $media;
 for my $col (qw( uuid id )) {
     $media = TQ::Media->new( $col => $media_id )->load_speculative;
+    last if $media;
 }
 if ( !$media ) {
     die "No such media for id $media_id";
