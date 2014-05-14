@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use lib 'lib';
+use TQ::Media;
+use TQ::User;
+
+my $usage = "$0 user_guid file [...fileN]\n";
+my $user_guid = shift or die $usage;
+
+my $user = TQ::User->new( guid => $user_guid )->load;
+
+for my $file (@ARGV) {
+    my $media = TQ::Media->new( owner => $user, uri => $file );
+    $media->save();
+}
+
