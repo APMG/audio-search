@@ -34,6 +34,7 @@ my $json = $media->transcribe(
 );
 if ( $json and decode_json($json) ) {
     $media->transcript($json);
+    $media->status('C');    # complete
     $media->save();
 }
 else {
