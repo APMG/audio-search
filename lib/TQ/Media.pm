@@ -48,13 +48,42 @@ __PACKAGE__->meta->setup(
             key_columns => { 'user_id' => 'id' },
         },
     ],
-
+    relationships => [
+        jobs => {
+            class      => 'TQ::JobQueue',
+            type       => 'one to many',
+            column_map => { id => 'xid' },
+            query_args => [ type => 'M' ],
+        },
+    ],
 );
 
 sub insert {
     my $self = shift;
     $self->uuid( lc( create_uuid_as_string(UUID_V4) ) ) unless $self->uuid;
     $self->SUPER::insert();
+}
+
+sub save {
+    my $self   = shift;
+    my $is_new = $self->id ? 0 : 1;
+    my $rt     = $self->SUPER::save(@_);
+    if ($is_new) {
+        $self->create_job();
+    }
+    return $rt;
+}
+
+sub create_job {
+    my $self = shift;
+    my $id   = $self->id or confess "must have id set to create job";
+    my $job  = TQ::JobQueue->new(
+        xid        => $id,
+        type       => 'M',
+        created_by => $self->user_id,
+        cmd        => qq/mk-transcript $id/,
+    );
+    $job->save();
 }
 
 sub primary_key_uri_escaped {
@@ -172,7 +201,7 @@ sub transcript_as_text {
 sub keywords {
     my $self = shift;
     my $text = $self->transcript_as_text;
-    return TQ::Utils::extract_keywords( $text );
+    return TQ::Utils::extract_keywords($text);
 }
 
 1;

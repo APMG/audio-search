@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More tests => 6;
 use lib 'lib';
 
 # test media class
@@ -29,3 +29,10 @@ ok( my $media = MyTestMedia->new(
 );
 
 ok( $media->uuid, "media->uuid default set" );
+
+ok( my $job = $media->jobs->[0], "one job created" );
+is( $job->cmd, sprintf( "mk-transcript %d", $media->id ), "job cmd" );
+is( $job->type, 'M', "job->type == M" );
+
+# clean up
+$job->delete;
