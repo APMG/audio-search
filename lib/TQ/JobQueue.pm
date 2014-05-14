@@ -166,13 +166,18 @@ sub lock {
 }
 
 sub get_queued {
-    my $self   = shift;              # object or class method
+    my $self = shift;          # object or class method
+    my $limit = shift || 10;
+    if ( $limit =~ m/\D/ ) {
+        confess "limit must be an integer";
+    }
     my $queued = $self->fetch_all(
         query => [
             start_dtim    => undef,
             schedule_dtim => { le => [ undef, time() ] }
         ],
-        sort_by => 'created_at ASC'
+        sort_by => 'created_at ASC',
+        limit   => $limit,
     );
     return $queued;
 }
@@ -183,7 +188,7 @@ sub get_queued_with_locks {
     # TODO race condition here if we ran multiple processes
     # simultaneously, since between fetch and lock another fetch
     # could happen.
-    my $queued = $self->get_queued();
+    my $queued = $self->get_queued(@_);
     for my $job (@$queued) {
         $job->lock();
     }
@@ -197,6 +202,7 @@ sub get_locked {
         query => [
             '!start_dtim' => undef,    # is not null
             complete_dtim => undef,    # is null
+            host => TQ::Config->get_hostname(),    # limit to this machine
         ],
         sort_by => 'created_at ASC'
     );

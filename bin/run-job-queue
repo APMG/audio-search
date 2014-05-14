@@ -20,6 +20,14 @@ $ENV{TQ_USE_MASTER} = 1;
 
 umask(0007);    # group rw, world null
 
+my $help  = 0;
+my $limit = 4;    # number of jobs per-host per-run
+GetOptions(
+    'help'    => \$help,
+    'limit=i' => \$limit,
+) or pod2usage(2);
+pod2usage(1) if $help;
+
 # if any are locked, just exit
 # since we do not want concurrent jobs running.
 # TODO this may change if we ever move to a clustered
@@ -49,7 +57,7 @@ if ( scalar(@$locked) ) {
     exit(0);
 }
 
-my $queued = TQ::JobQueue->get_queued_with_locks();
+my $queued = TQ::JobQueue->get_queued_with_locks($limit);
 
 for my $job (@$queued) {
     if ( !$job->run() ) {
