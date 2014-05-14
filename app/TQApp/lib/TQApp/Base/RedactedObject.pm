@@ -21,6 +21,13 @@ around 'serialize' => sub {
         }
     }
 
+    # same thing for any column looks like datetime
+    for my $col ( keys %$hashref ) {
+        next unless defined $hashref->{$col};
+        next unless $col =~ m/_dtim$/;
+        $hashref->{$col} = parse_date( $hashref->{$col} ) . "";
+    }
+
     return $hashref;
 };
 
