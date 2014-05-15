@@ -1,3 +1,4 @@
 * authn/authz
 * example crontab
 * better default audio paths?
+* fix race-condition bug with job_queue on multiple hosts
