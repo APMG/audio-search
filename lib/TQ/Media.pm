@@ -114,11 +114,11 @@ sub transcribe {
     }
     elsif ( lc $ext eq 'mp3' ) {
         TQ::Utils::run_it("lame --decode $file $base.wav");
-        TQ::Utils::run_it("sox $base.wav -r16k $base-16k.wav");
+        TQ::Utils::run_it("sox $base.wav -r 16000 $base-16k.wav");
         $wav16k = "$base-16k.wav";
     }
     elsif ( lc $ext eq 'wav' ) {
-        TQ::Utils::run_it("sox $file -r16k $base-16k.wav");
+        TQ::Utils::run_it("sox $file -r 16000 $base-16k.wav");
         $wav16k = "$base-16k.wav";
     }
     else {
