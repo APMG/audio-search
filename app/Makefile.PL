@@ -63,6 +63,7 @@ requires "Parallel::Forker"            => "1.232";
 requires "Path::Class"                 => 0.32;
 requires "Path::Class::File::Lockable" => 0.02;
 requires "Rose::DateTime::Parser"      => "0.50";
+requires "Rose::DateTime"              => "0.540";
 requires "Rose::DB::Object"            => 0.789;
 requires "Rose::DBx::AutoReconnect"    => 0;
 requires "Search::Tools"               => '1.000';
