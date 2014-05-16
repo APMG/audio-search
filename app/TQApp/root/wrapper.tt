@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="audio transcription service">
+  <meta name="author" content="American Public Media Group">
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+
+  <link rel="stylesheet" href="[% c.uri_for('/static/tq.css') %]">
+ 
+  <title>[% title %] :: [% c.config.name %]</title> 
+ </head>
+
+ <body>
+
+    <div class="container">
+
+      <!-- Static navbar -->
+      <div class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="[% c.uri_for('/' ) %]">[% c.config.name %]</a>
+          </div>
+          <div class="navbar-collapse collapse">
+            [% # TODO set class="active" for current uri %]
+            <ul class="nav navbar-nav">
+              <li><a href="[% c.uri_for('/') %]">Home</a></li>
+              <li><a href="[% c.uri_for('/mine') %]">My Audio</a></li>
+            <!--
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Action</a></li>
+                  <li><a href="#">Another action</a></li>
+                  <li><a href="#">Something else here</a></li>
+                  <li class="divider"></li>
+                  <li class="dropdown-header">Nav header</li>
+                  <li><a href="#">Separated link</a></li>
+                  <li><a href="#">One more separated link</a></li>
+                </ul>
+              </li>
+            -->
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li class="active"><a href="./">Default</a></li>
+              <li><a href="../navbar-static-top/">Static top</a></li>
+              <li><a href="../navbar-fixed-top/">Fixed top</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </div>
+
+      <div id="alerts"></div>
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+      [% content %]
+      </div>
+
+    </div> <!-- /container -->
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="[% c.uri_for('/static/tq.js') %]"></script>
+  </body>
+</html>

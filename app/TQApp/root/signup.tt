@@ -1,0 +1,76 @@
+<h2>Create an account</h2>
+
+<div id="signup">
+ <form id="signup-form" action="[% c.uri_for('/signup') %]" method="POST">
+ <div class="input-group">
+  <input name="name" type="text" class="form-control" placeholder="Name">
+  <input name="email" type="text" class="form-control" placeholder="Email">
+  <input name="pw1" type="password" class="form-control" placeholder="Password">
+  <input name="pw2" type="password" class="form-control" placeholder="Password Again">
+ </div>
+ <div class="btn-group">
+  <a onclick="do_signup(); return false;" href="#" class="btn btn-primary" role="button">Signup</a>
+ </div>
+ <div class="input-group" id="signup-alerts"></div>
+ </form>
+</div>
+
+<script type="text/javascript">
+    function do_signup() {
+        var uname = $('[name="name"]').val();
+        var email = $('[name="email"]').val();
+        var pw1   = $('[name="pw1"]').val();
+        var pw2   = $('[name="pw2"]').val();
+        var alerts = $('#signup-alerts');
+
+        if (!uname.length) {
+            TQ.set_alert('Name required', alerts);
+            return;
+        }
+        if (!email.length) {
+            TQ.set_alert('Email required', alerts);
+            return;
+        }
+        if (!pw1.length || !pw2.length) {
+            TQ.set_alert('Password required', alerts);
+            return;
+        }
+        if (pw1 != pw2) {
+            TQ.set_alert('Passwords do not match', alerts);
+            return;
+        }
+
+        // password strength? https://github.com/ablanco/jquery.pwstrength.bootstrap
+
+        var payload = { name: uname, email: email, pw: pw1 };
+        console.log(payload);
+
+        $.ajaxSetup({
+            xhrFields: {
+                withCredentials : true  // allow FF to send auth cookie
+            },
+            headers: {
+                "X-Requested-With" : "xmlhttprequest"  // tell server we're ajax
+            }
+        });
+
+        $.ajax({
+            type:"POST",
+            url: '[% c.uri_for('/v1/user') %]',
+            data: JSON.stringify(payload),
+            processData: false,
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function(jqXHR) {
+                TQ.set_alert('Success! A confirmation email has been sent to '+email+'.', alerts, 'info');
+                return;
+            },
+            error: function(jqXHR) {
+                TQ.set_alert('Uh-oh. There was a problem creating your account.', alerts);
+                console.log(jqXHR);
+                return;
+            }
+        });
+
+    }
+</script>
