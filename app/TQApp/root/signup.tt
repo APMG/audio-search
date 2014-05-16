@@ -9,7 +9,7 @@
   <input name="pw2" type="password" class="form-control" placeholder="Password Again">
  </div>
  <div class="btn-group">
-  <a onclick="do_signup(); return false;" href="#" class="btn btn-primary" role="button">Signup</a>
+  <a id="signup-button" onclick="do_signup(); return false;" href="#" class="btn btn-primary" role="button">Signup</a>
  </div>
  <div class="input-group" id="signup-alerts"></div>
  </form>
@@ -45,6 +45,10 @@
         var payload = { name: uname, email: email, pw: pw1 };
         console.log(payload);
 
+        // disable button to prevent multi-clicks
+        $('#signup-button').attr('disabled', true);
+        $('#signup-button').addClass('disabled');
+
         $.ajaxSetup({
             xhrFields: {
                 withCredentials : true  // allow FF to send auth cookie
@@ -63,11 +67,14 @@
             dataType: 'json',
             success: function(jqXHR) {
                 TQ.set_alert('Success! A confirmation email has been sent to '+email+'.', alerts, 'info');
+                $('#signup-button').remove(); // prevent more clicks
                 return;
             },
             error: function(jqXHR) {
-                TQ.set_alert('Uh-oh. There was a problem creating your account.', alerts);
+                TQ.set_alert('Uh-oh. There was a problem creating your account. Try again later.', alerts);
                 console.log(jqXHR);
+                $('#signup-button').attr('disabled', false);
+                $('#signup-button').removeClass('disabled');
                 return;
             }
         });
