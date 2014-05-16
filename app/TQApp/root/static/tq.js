@@ -4,7 +4,7 @@ TQ = {};
 
 "use strict";
 
-TQ.set_alert = function(msg, where, type) {
+TQ.setAlert = function(msg, where, type) {
     if (!$(where) || !$(where).length) {
         where = '#alerts';
     }
@@ -16,4 +16,9 @@ TQ.set_alert = function(msg, where, type) {
     div += '</div>';
     $(where).html(div);
 }
- 
+
+TQ.getMedia = function(el, user) {
+    // pull all the media for the user
+
+
+}

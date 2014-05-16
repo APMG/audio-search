@@ -1,10 +1,11 @@
+<div class="jumbotron">
 <h1>Welcome</h1>
-
 <p>
-The [% name %] application is an automated audio transcription service.
+The [% c.config.name %] application is an automated audio transcription service.
 </p>
 
 <p>
 <a class="btn btn-primary btn-lg" role="button" href="[% c.uri_for('/signup') %]">Sign up</a>
-<a class="btn btn-lg btn-default" role="button" href="[% c.uri_for('/login') %]">Login</a>
+<a class="btn btn-lg btn-default" role="button" href="[% c.uri_for('/user') %]">Login</a>
 </p>
+</div>

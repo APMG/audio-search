@@ -1,0 +1,20 @@
+<h2>My Media</h2>
+
+<div id="media" class="panel panel-default">
+ <div class="panel-heading">
+  <h4>Transcriptions</h4>
+ </div>
+ <div class="panel-body">
+  <img src="[% c.uri_for('/static/spinner.gif') %]" /> Loading...
+ </div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready( function() {
+        TQ.getMedia(
+            $('#media .panel-body'),
+            { guid:'[% user.guid %]', key:'[% user.api_key %]' }
+        );
+    });
+</script>

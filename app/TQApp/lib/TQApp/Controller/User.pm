@@ -31,7 +31,7 @@ sub confirm : Local Args(1) {
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
     $c->authenticate( {}, "tqapp" );
-    $c->stash( template => 'user/index.tt' );
+    $c->stash( user => $c->user->user, template => 'user/index.tt' );
 }
 
 __PACKAGE__->meta->make_immutable;

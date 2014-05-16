@@ -23,7 +23,7 @@ requires 'CatalystX::RoleApplicator';
 requires 'Catalyst::TraitFor::Request::ProxyBase';
 requires 'Catalyst::Plugin::Authentication';
 requires 'Catalyst::Plugin::Static::Simple::ByClass';
-requires 'Catalyst::Authentication::AuthTkt';
+requires 'Catalyst::Authentication::Credential::HTTP';
 requires 'CatalystX::CRUD'                   => '0.56';
 requires 'CatalystX::CRUD::Model::RDBO'      => '0.301';
 requires 'Catalyst::Controller::REST'        => 0;

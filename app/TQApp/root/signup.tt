@@ -24,19 +24,19 @@
         var alerts = $('#signup-alerts');
 
         if (!uname.length) {
-            TQ.set_alert('Name required', alerts);
+            TQ.setAlert('Name required', alerts);
             return;
         }
         if (!email.length) {
-            TQ.set_alert('Email required', alerts);
+            TQ.setAlert('Email required', alerts);
             return;
         }
         if (!pw1.length || !pw2.length) {
-            TQ.set_alert('Password required', alerts);
+            TQ.setAlert('Password required', alerts);
             return;
         }
         if (pw1 != pw2) {
-            TQ.set_alert('Passwords do not match', alerts);
+            TQ.setAlert('Passwords do not match', alerts);
             return;
         }
 
@@ -66,12 +66,12 @@
             contentType: 'application/json',
             dataType: 'json',
             success: function(jqXHR) {
-                TQ.set_alert('Success! A confirmation email has been sent to '+email+'.', alerts, 'info');
+                TQ.setAlert('Success! A confirmation email has been sent to '+email+'.', alerts, 'info');
                 $('#signup-button').remove(); // prevent more clicks
                 return;
             },
             error: function(jqXHR) {
-                TQ.set_alert('Uh-oh. There was a problem creating your account. Try again later.', alerts);
+                TQ.setAlert('Uh-oh. There was a problem creating your account. Try again later.', alerts);
                 console.log(jqXHR);
                 $('#signup-button').attr('disabled', false);
                 $('#signup-button').removeClass('disabled');
