@@ -6,6 +6,10 @@ use Carp;
 use IPC::Cmd ();
 use TQ::Config;
 use UUID::Tiny ':std';
+use Data::Dump qw( dump );
+
+# TODO use TQ::Config for this
+my $MAX_PER_QUEUE = 10;
 
 __PACKAGE__->meta->setup(
     table => 'job_queue',
@@ -73,7 +77,16 @@ sub add_job {
 }
 
 sub run {
-    my $self    = shift;
+    my $self     = shift;
+    my %arg      = @_;
+    my $hostname = $arg{hostname} || TQ::Config->get_hostname();
+
+    # if this job was queued by/for some other host
+    # confirm we have the right host.
+    if ( $self->host and $self->host ne $hostname ) {
+        confess sprintf( "Job %d queued for host %s but this is host %s\n",
+            $self->id, $self->host, $hostname );
+    }
     my $cmd     = $self->cmd;
     my $root    = TQ::Config::get_app_root();
     my $log_dir = TQ::Config::get_log_dir();
@@ -110,7 +123,7 @@ sub run {
 
     # job meta
     $self->pid($$);
-    $self->host( TQ::Config->get_hostname() );
+    $self->host($hostname);    # in case it is undef
     $self->start_dtim( time() );
     $self->save();
 
@@ -157,24 +170,49 @@ sub run {
 }
 
 sub lock {
-    my $self = shift;
-    if ( $self->is_locked ) {
-        croak sprintf( "job %s is already locked", $self->id );
+    my $self     = shift;
+    my %arg      = @_;
+    my $hostname = $arg{hostname} || TQ::Config->get_hostname();
+
+    # we lock-per-hostname
+    # since we are potentially competing with N other job-running-hosts.
+    # we leverage the row-locking behavior of the db and run an UPDATE
+    # with an explicit WHERE for the host value so that we can trust
+    # that our lock is exclusive to $hostname.
+    my $dbh = $self->db->dbh;
+    my $sql
+        = qq/update job_queue set host=? where id=? and (host=? or host is null)/;
+    my $updated = $dbh->do( $sql, undef, $hostname, $self->id, $hostname );
+    if ( $updated == 0 or $updated == "0E0" ) {
+        return 0;
     }
+    else {
+        $self->load;    # re-load
+                        # sanity check
+        if ( !$self->host or $self->host ne $hostname ) {
+            return 0;
+        }
+    }
+
+    # will be re-set by run(). this just flags as locked.
     $self->start_dtim( time() );
     $self->save();
+    return 1;
 }
 
 sub get_queued {
-    my $self = shift;          # object or class method
-    my $limit = shift || 10;
+    my $self = shift;    # object or class method
+    my %arg  = @_;
+    my $hostname = $arg{hostname} || TQ::Config->get_hostname();
+    my $limit = $arg{limit} || $MAX_PER_QUEUE;
     if ( $limit =~ m/\D/ ) {
         confess "limit must be an integer";
     }
     my $queued = $self->fetch_all(
         query => [
             start_dtim    => undef,
-            schedule_dtim => { le => [ undef, time() ] }
+            schedule_dtim => { le => [ undef, time() ] },
+            or            => [ host => undef, host => $hostname ],
         ],
         sort_by => 'created_at ASC',
         limit   => $limit,
@@ -183,16 +221,22 @@ sub get_queued {
 }
 
 sub get_queued_with_locks {
-    my $self = shift;
-
-    # TODO race condition here if we ran multiple processes
-    # simultaneously, since between fetch and lock another fetch
-    # could happen.
-    my $queued = $self->get_queued(@_);
-    for my $job (@$queued) {
-        $job->lock();
+    my $self   = shift;
+    my %arg    = @_;
+    my $limit  = $arg{limit} || $MAX_PER_QUEUE;
+    my @locked = ();
+LOOK: while ( @locked < $limit ) {
+        my $queued = $self->get_queued(%arg);
+        for my $job (@$queued) {
+            if ( $job->lock(%arg) ) {
+                push @locked, $job;
+            }
+        }
+        if ( !@$queued ) {
+            last LOOK;
+        }
     }
-    return $queued;
+    return \@locked;
 }
 
 sub get_locked {
