@@ -1,6 +1,6 @@
-This email confirms your account at [% c.config.name %].
+Thanks for signing up for an account at [% c.config.name %].
 
 Please confirm your account by clicking here:
-[% c.uri_for('/v1/user/confirm/' _ object.api_key) %]
+[% c.uri_for('/user/confirm/' _ object.guid) %]
 
 If you received this email in error, please disregard.

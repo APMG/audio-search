@@ -20,6 +20,7 @@ use Catalyst qw/
     -Debug
     ConfigLoader
     Static::Simple
+    Authentication
     /;
 
 extends 'Catalyst';
@@ -43,7 +44,23 @@ __PACKAGE__->config(
     enable_catalyst_header                      => 1, # Send X-Catalyst header
 
     default_view => 'TT',
-    'View::TT' => { INCLUDE_PATH => [ __PACKAGE__->path_to('root') ], },
+    'View::TT'   => { INCLUDE_PATH => [ __PACKAGE__->path_to('root') ], },
+
+    # basic auth is default. change to whatever you want.
+    authentication => {
+        default_realm => 'tqapp',
+        realms        => {
+            tqapp => {
+                credential => {
+                    class          => 'HTTP',
+                    type           => 'basic',
+                    password_type  => 'self_check',
+                    password_field => 'password',
+                },
+                store => { class => '+TQApp::Auth::Store', },
+            }
+        },
+    },
 );
 
 # Start the application

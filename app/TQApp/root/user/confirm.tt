@@ -1,0 +1,5 @@
+<h2>Confirmed</h2>
+
+<div>
+Your account is confirmed, [% user.name %]. You can start using [% c.config.name %] immediately.
+</div>

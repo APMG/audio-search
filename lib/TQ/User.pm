@@ -14,6 +14,18 @@ __PACKAGE__->meta->setup(
         pw      => { type => 'char',    length   => 64, not_null => 1 },
         api_key => { type => 'char',    length   => 36, not_null => 1, },
         name    => { type => 'varchar', length   => 255, not_null => 1 },
+        status => {
+            type     => 'char',
+            length   => 1,
+            not_null => 1,
+            default  => 'T',
+        },
+        type => {
+            type     => 'char',
+            length   => 1,
+            not_null => 1,
+            default  => 'U',
+        },
         email => {
             type     => 'varchar',
             length   => 255,

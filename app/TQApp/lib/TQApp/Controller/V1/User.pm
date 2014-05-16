@@ -24,10 +24,10 @@ sub send_confirmation_email {
     my $user = $c->stash->{object};
     $c->log->debug( "send confirmation email to user " . $user->email );
     my %email = (
-        to           => $user->email,
-        from         => $c->config->{email_from},
-        subject      => $c->config->{name} . ' account confirmation',
-        template     => 'user_confirmation.tt',
+        to       => $user->email,
+        from     => $c->config->{email_from},
+        subject  => $c->config->{name} . ' account confirmation',
+        template => 'user_confirmation.tt',
     );
     $c->stash( email => \%email );
     $c->forward( $c->view('Email') );
