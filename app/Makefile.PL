@@ -67,7 +67,7 @@ requires "Rose::DB::Object"            => 0.789;
 requires "Rose::DBx::AutoReconnect"    => 0;
 requires "Search::Tools"               => '1.000';
 requires "Sys::Hostname"               => 1.16;
-requires "Template"                    => '2.75';
+requires "Template"                    => '2.25';
 requires "Term::ProgressBar::Simple";
 requires "Text::CSV_XS";
 requires "Try::Tiny";
