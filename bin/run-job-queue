@@ -57,7 +57,7 @@ if ( scalar(@$locked) ) {
     exit(0);
 }
 
-my $queued = TQ::JobQueue->get_queued_with_locks($limit);
+my $queued = TQ::JobQueue->get_queued_with_locks( limit => $limit );
 
 for my $job (@$queued) {
     if ( !$job->run() ) {
