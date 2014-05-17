@@ -82,5 +82,8 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <script src="[% c.uri_for('/static/tq.js') %]"></script>
+    <script type="text/javascript">
+        TQ.APIBase = '[% c.uri_for('/v1') %]';
+    </script>
   </body>
 </html>

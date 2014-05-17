@@ -1,8 +1,23 @@
 <h2>My Media</h2>
 
+<div id="media-create" class="panel panel-default">
+ <div class="panel-heading">
+  <h4>Create Transcription</h4>
+ </div>
+ <div class="panel-body">
+  <form action="[% c.uri_for('/v1/user/' _ user.guid _ '/media') %]" method="POST">
+   <div class="input-group">
+    <input size="128" name="uri" type="text" class="form-control" placeholder="URI">
+   </div>
+   <div class="btn-group">
+    <a onclick="TQ.createMedia($(this), $('#media .panel-body')); return false;" href="#" class="btn btn-primary" role="button">Create</a>
+   </div>
+  </form>
+ </div>
+</div>
 <div id="media" class="panel panel-default">
  <div class="panel-heading">
-  <h4>Transcriptions</h4>
+  <h4>My Transcriptions</h4>
  </div>
  <div class="panel-body">
   <img src="[% c.uri_for('/static/spinner.gif') %]" /> Loading...
@@ -12,9 +27,7 @@
 
 <script type="text/javascript">
     $(document).ready( function() {
-        TQ.getMedia(
-            $('#media .panel-body'),
-            { guid:'[% user.guid %]', key:'[% user.api_key %]' }
-        );
+        TQ.User = { guid:'[% user.guid %]', key:'[% user.api_key %]' };
+        TQ.getMedia( $('#media .panel-body') );
     });
 </script>
