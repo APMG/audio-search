@@ -6,4 +6,15 @@ use lib "$FindBin::Bin/../lib";
 
 use TQ::Config;
 
-# currently placeholder
+# let frontend proxy serve static files
+my $public_html = TQ::Config->get_app_root->subdir('app/public_html');
+my $static_root = TQ::Config->get_app_root->subdir('app/TQApp/root/static');
+
+if ( -l $public_html->file('static') ) {
+    print "public_html/static symlink ok\n";
+}
+else {
+    symlink "$static_root", "$public_html/static"
+        or die "Can't create symlink for public_html/static: $!";
+    print ">> created $static_root symlink\n";
+}
