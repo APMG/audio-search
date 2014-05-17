@@ -7,11 +7,13 @@
  <div class="panel-body">
   <form action="[% c.uri_for('/v1/user/' _ user.guid _ '/media') %]" method="POST">
    <div class="input-group">
+    <input size="128" name="name" type="text" class="form-control" placeholder="Name">
     <input size="128" name="uri" type="text" class="form-control" placeholder="URI">
    </div>
    <div class="btn-group">
     <a onclick="TQ.createMedia($(this), $('#media .panel-body')); return false;" href="#" class="btn btn-primary" role="button">Create</a>
    </div>
+   <div class="input-group" id="create-media-alerts"></div> 
   </form>
  </div>
 </div>
@@ -24,6 +26,23 @@
  </div>
 </div>
 
+<!-- Modal hidden on load -->
+<div class="modal fade" id="media-modal" tabindex="-1" role="dialog" aria-labelledby="mediaModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="mediaModal"></h4>
+      </div>
+      <div class="modal-body" id="media-modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">View Details</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script type="text/javascript">
     $(document).ready( function() {

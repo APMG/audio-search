@@ -22,25 +22,36 @@ TQ.STATUS = {
     A : 'In Process'
 };
 
+TQ.SPINNER = null;
+
 TQ.getMedia = function(el, user) {
     if (!user) user = TQ.User;
 
+    // cache the contents of the 'loading' img/message the first time
+    if (!TQ.SPINNER) {
+        TQ.SPINNER = $('#media .panel-body').html();
+    }
+
     // pull all the media for the user
-    var mediaUri = TQ.APIBase + '/user/' + user.guid + '/media/?tq=' + user.key;
+    var mediaUri = TQ.APIBase + '/user/' + user.guid + '/media/?cxc-order=updated_at+DESC&tq=' + user.key;
     $.getJSON(mediaUri, function(resp) {
         //console.log(resp); 
         var media = '<table class="table table-striped">';
+            media += '<tr><th>Name</th><th>URI</th><th>Status</th><th>Last Modified</th></tr>';
         $.each(resp, function(idx, m) {
-            console.log(m);
+            //console.log(m);
             var n    = m.name ? m.name : m.uuid;
             var link = '<a href="#" data-uuid="'+m.uuid+'" onclick="TQ.showMedia($(this))">'+n+'</a>';
             var d    = m.updated_at;
             var stat = TQ.STATUS[m.status];
-            var row = '<tr><td>'+link+'</td><td>'+stat+'</td><td>'+d+'</td></tr>';
+            var row = '<tr><td class="tq-uuid">'+link+'</td><td class="tq-uri">'+m.uri+'</td><td>'+stat+'</td><td>'+d+'</td></tr>';
             media += row;
         });
         media += '</table>';
         el.html(media);
+
+        // reload again in 30 seconds
+        setTimeout( function() { TQ.getMedia(el,user) }, 30000);
     });
 
 }
@@ -48,8 +59,10 @@ TQ.getMedia = function(el, user) {
 TQ.createMedia = function(btn, el, user) {
     if (!user) user = TQ.User;
     var uri = $('[name="uri"]').val();
+    var mname = $('[name="name"]').val();
     var mediaUri = TQ.APIBase + '/user/' + user.guid + '/media';
-    var payload = { uri : uri };
+    var payload = { uri : uri, name: mname };
+    var alerts = $('#create-media-alerts');
 
     // prevent multi-clicks
     btn.attr('disabled', true);
@@ -63,15 +76,16 @@ TQ.createMedia = function(btn, el, user) {
         contentType: 'application/json',
         dataType: 'json',
         success: function(jqXHR) {
-            TQ.setAlert('Success! Your media has been queued and you will receive email with details.', null, 'info');
+            TQ.setAlert('Success! Your media has been queued and you will receive email with details.', alerts, 'info');
             btn.attr('disabled', false);
             btn.removeClass('disabled');
             $('[name="uri"]').val(''); // clear
+            $('[name="name"]').val(''); // clear
             TQ.getMedia(el, user); // update list
             return;
         },
         error: function(jqXHR) {
-            TQ.setAlert('Uh-oh. There was a problem queuing your media. Try again later.');
+            TQ.setAlert('Uh-oh. There was a problem queuing your media. Try again later.', alerts);
             console.log(jqXHR);
             btn.attr('disabled', false);
             btn.removeClass('disabled');
@@ -80,3 +94,29 @@ TQ.createMedia = function(btn, el, user) {
     });
 
 }
+
+TQ.showMedia = function(link, user) {
+    var uuid = link.data('uuid');
+    if (!user) user = TQ.User;
+    //console.log('uuid=', uuid);
+
+    // set title
+    $('#mediaModal').html(uuid);
+
+    // set progress
+    var modal = $('#media-modal');
+    $('#media-modal-body').html(TQ.SPINNER);
+
+    // fetch details
+    var uri = TQ.APIBase + '/media/' + uuid + '/keywords?tq=' + user.key; 
+    $.getJSON(uri, function(resp) {
+        //console.log(resp);
+        var details = 'Key words: <pre>' + resp.keywords.slice(0,10).join("\n") + '</pre>';
+        $('#media-modal-body').html(details);
+    });    
+
+    // show modal
+    modal.modal({ });
+
+}
+

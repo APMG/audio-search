@@ -6,3 +6,12 @@
     margin: 2px 0;
 }
 
+td.tq-uuid {
+    max-width: 12em;
+}
+
+td.tq-uri {
+    word-wrap: break-word;
+    max-width: 100px;
+}
+
