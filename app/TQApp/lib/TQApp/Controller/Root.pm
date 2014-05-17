@@ -4,6 +4,8 @@ use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller' }
 
+use Data::Dump qw( dump );
+
 #
 # Sets the actions in this controller to be registered with no prefix
 # so they function identically to actions created in MyApp.pm
@@ -42,6 +44,7 @@ Standard 404 error page
 
 sub default : Path {
     my ( $self, $c ) = @_;
+    $c->log->debug( dump $c->request );
     $c->stash( template => '404.tt' );
     $c->response->status(404);
 }

@@ -8,7 +8,8 @@ __PACKAGE__->config(
         content_type => 'text/plain',
         charset      => 'utf-8',
         view         => 'TTPlain',
-    }
+    },
+    sender => { mailer => 'SMTP', }
 );
 
 __PACKAGE__->meta->make_immutable( inline_constructor => 0 );

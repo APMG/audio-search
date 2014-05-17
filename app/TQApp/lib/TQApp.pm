@@ -16,12 +16,12 @@ use Catalyst::Runtime 5.80;
 # Static::Simple: will serve static files from the application's root
 #                 directory
 
-use Catalyst qw/
-    -Debug
+use Catalyst qw(
     ConfigLoader
     Static::Simple
     Authentication
-    /;
+);
+use CatalystX::RoleApplicator;
 
 extends 'Catalyst';
 
@@ -41,7 +41,7 @@ __PACKAGE__->config(
 
     # Disable deprecated behavior needed by old applications
     disable_component_resolution_regex_fallback => 1,
-    enable_catalyst_header                      => 1, # Send X-Catalyst header
+    #enable_catalyst_header                      => 1, # Send X-Catalyst header
 
     default_view => 'TT',
     'View::TT'   => { INCLUDE_PATH => [ __PACKAGE__->path_to('root') ], },
@@ -61,6 +61,12 @@ __PACKAGE__->config(
             }
         },
     },
+);
+
+__PACKAGE__->apply_request_class_roles(
+    qw(
+        Catalyst::TraitFor::Request::ProxyBase
+        )
 );
 
 # Start the application
