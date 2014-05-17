@@ -68,6 +68,10 @@
             success: function(jqXHR) {
                 TQ.setAlert('Success! A confirmation email has been sent to '+email+'.', alerts, 'info');
                 $('#signup-button').remove(); // prevent more clicks
+                $('[name="pw1"]').remove();
+                $('[name="pw2"]').remove();
+                $('#signup input').attr('disabled', true);
+                $('#signup input').addClass('disabled');
                 return;
             },
             error: function(jqXHR) {

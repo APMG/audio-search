@@ -26,6 +26,22 @@ sub confirm : Local Args(1) {
     $user->status('A');
     $user->save();
     $c->stash( user => $user, template => 'user/confirm.tt' );
+    $self->send_account_email($c);
+}
+
+sub send_account_email {
+    my ( $self, $c ) = @_;
+    my $user = $c->stash->{user};
+    $c->log->debug( "send account email to user " . $user->email )
+        if $c->debug;
+    my %email = (
+        to       => $user->email,
+        from     => $c->config->{email_from},
+        subject  => $c->config->{name} . ' account details',
+        template => 'user_account.tt',
+    );
+    $c->stash( email => \%email );
+    $c->forward( $c->view('Email') );
 }
 
 sub index : Path : Args(0) {

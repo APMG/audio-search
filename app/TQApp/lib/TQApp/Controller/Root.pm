@@ -49,7 +49,7 @@ sub default : Path {
     $c->response->status(404);
 }
 
-sub login : Local {
+sub api : Local {
     my ( $self, $c ) = @_;
 }
 

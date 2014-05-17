@@ -1,0 +1,22 @@
+Thanks for confirming your account at [% c.config.name %].
+
+Keep this email for future reference.
+
+You can always view your account at:
+
+ [% c.uri_for('/user') %]
+
+Your API credentials are:
+
+ GUID: [% user.guid %]
+ KEY:  [% user.api_key %]
+
+Example for using the API:
+
+ GET [% c.uri_for('/v1/user/' _ user.guid, { 'tq' = user.api_key }) %]
+
+You can read all about the API here:
+
+ [% c.uri_for('/api') %]
+
+Thanks for using [% c.config.name %]!

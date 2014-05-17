@@ -22,7 +22,8 @@ around 'zero_args_POST' => sub {
 sub send_confirmation_email {
     my ( $self, $c ) = @_;
     my $user = $c->stash->{object};
-    $c->log->debug( "send confirmation email to user " . $user->email );
+    $c->log->debug( "send confirmation email to user " . $user->email )
+        if $c->debug;
     my %email = (
         to       => $user->email,
         from     => $c->config->{email_from},

@@ -1,0 +1,33 @@
+<h2>[% c.config.name %] API</h2>
+
+<div class="col-md-9" role="main">
+
+ <div class="tq-docs-section">
+  <h1 id="overview" class="page-header">Overview</h1>
+  <p>
+
+  </p>
+ </div>
+ <div class="tq-docs-section">
+  <h1 id="user" class="page-header">User</h1>
+  <p>
+
+  </p>
+ </div>
+ <div class="tq-docs-section">
+  <h1 id="media" class="page-header">Media</h1>
+  <p>
+
+  </p>
+ </div>
+</div>
+
+<div class="col-md-3">
+ <div class="tq-docs-sidebar hidden-print affix" role="complementary">
+  <ul class="nav tq-docs-sidenav">
+   <li><a href="#overview">Overview</a></li>
+   <li><a href="#user">User</a></li>
+   <li><a href="#media">Media</a></li>
+  </ul>
+ </div>
+</div>
