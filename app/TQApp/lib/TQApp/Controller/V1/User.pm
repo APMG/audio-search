@@ -34,6 +34,28 @@ sub send_confirmation_email {
     $c->forward( $c->view('Email') );
 }
 
+around 'fetch' => sub {
+    my ( $super_method, $self, $c, $guid ) = @_;
+
+    # user can only read itself
+    if ( $c->stash->{user}->guid eq $guid ) {
+        return $self->$super_method( $c, $guid );
+    }
+    $self->status_forbidden( $c, message => 'Permission denied' );
+    $c->stash( fetch_failed => 1 );    # trigger abort elsewhere
+    return;
+};
+
+sub can_write {
+    my ( $self, $c ) = @_;
+
+    # user can only write itself
+    if ( $c->stash->{user}->guid eq $c->stash->{object}->guid ) {
+        return 1;
+    }
+    return 0;
+}
+
 __PACKAGE__->meta->make_immutable();
 
 1;
