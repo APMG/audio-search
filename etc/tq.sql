@@ -19,6 +19,7 @@ create table if not exists `users` (
     PRIMARY KEY (`id`),
     UNIQUE KEY (`guid`),
     UNIQUE KEY (`email`),
+    UNIQUE KEY (`api_key`),
     CONSTRAINT `users_created_by_fk` foreign key (created_by) references users (id),
     CONSTRAINT `users_updated_by_fk` foreign key (updated_by) references users (id)
 ) engine = InnoDB default character set = utf8 collate utf8_bin;

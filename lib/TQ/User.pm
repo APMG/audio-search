@@ -43,7 +43,7 @@ __PACKAGE__->meta->setup(
 
     primary_key_columns => ['id'],
 
-    unique_keys => [ ['guid'], ['email'] ],
+    unique_keys => [ ['guid'], ['email'], ['api_key'] ],
 
     alias_column => [qw( pw local_password )],
 
