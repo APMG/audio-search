@@ -6,6 +6,8 @@ You can always view your account at:
 
  [% c.uri_for('/user') %]
 
+Your username is your email address.
+
 Your API credentials are:
 
  GUID: [% user.guid %]
