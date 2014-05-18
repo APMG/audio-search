@@ -64,6 +64,11 @@ TQ.createMedia = function(btn, el, user) {
     var payload = { uri : uri, name: mname };
     var alerts = $('#create-media-alerts');
 
+    if (!uri) {
+        TQ.setAlert("URI value is required", alerts);
+        return;
+    }
+
     // prevent multi-clicks
     btn.attr('disabled', true);
     btn.addClass('disabled');
