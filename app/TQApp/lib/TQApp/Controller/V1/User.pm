@@ -49,7 +49,17 @@ around 'fetch' => sub {
 sub can_write {
     my ( $self, $c ) = @_;
 
-    # user can only write itself
+    # absence of $user means we were called directly, not via auto().
+    if ( !$c->stash->{user} ) {
+        return 1;
+    }
+
+    # any user can create itself
+    if ( !$c->stash->{object} or $c->stash->{object}->is_new ) {
+        return 1;
+    }
+
+    # user can only update itself
     if ( $c->stash->{user}->guid eq $c->stash->{object}->guid ) {
         return 1;
     }

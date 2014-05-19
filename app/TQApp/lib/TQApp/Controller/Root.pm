@@ -55,6 +55,15 @@ sub api : Local {
 
 sub signup : Local {
     my ( $self, $c ) = @_;
+    if ( uc $c->req->method eq 'POST' ) {
+
+        # internal proxy to api.
+        # must bypass API authn check and mimic REST handling.
+        my $user_ctrl = $c->controller('V1::User');
+        my $begin = $user_ctrl->action_for('begin');
+        $begin->execute($user_ctrl, $c); 
+        $user_ctrl->zero_args_POST($c);
+    }
 }
 
 =head2 end

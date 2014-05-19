@@ -60,7 +60,7 @@
 
         $.ajax({
             type:"POST",
-            url: '[% c.uri_for('/v1/user') %]',
+            url: '[% c.uri_for('/signup') %]',
             data: JSON.stringify(payload),
             processData: false,
             contentType: 'application/json',
