@@ -118,6 +118,10 @@ TQ.showMedia = function(link, user) {
     // details link
     $('#media-modal .media-details-link').attr('href', TQ.UriBase + 'media/' + uuid);
 
+    // preview player
+    var playerUri = TQ.UriBase + 'media/player/' + uuid;
+    $('#media-modal .modal-footer iframe').attr('src', playerUri);
+
     // fetch details
     var uri = TQ.APIBase + '/media/' + uuid + '/keywords'; 
     $.getJSON(uri, function(resp) {
