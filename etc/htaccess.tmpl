@@ -10,7 +10,7 @@ SetEnv TQ_BASE_URI "[% server_base_uri %]"
 
 # proxy everything that isn't a real file or dir
 # to the backend app
-RequestHeader set X-Request-Base '[% server_base_uri_path %]'
+RequestHeader set X-Request-Base '[% server_base_uri %]'
 RewriteEngine on
 
 # allow deployment in non-root directory
