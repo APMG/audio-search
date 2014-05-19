@@ -1,2 +1,5 @@
 * example crontab
 * better default audio paths?
+* email confirmation on mk-transcript success
+* /media/:uuid endpoint for ui details
+* /v1 SPORE response
