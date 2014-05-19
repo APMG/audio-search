@@ -38,7 +38,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">View Details</button>
+        <a href="#" class="media-details-link btn btn-primary" role="button">View Details</a>
       </div>
     </div>
   </div>

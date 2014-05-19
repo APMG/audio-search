@@ -115,11 +115,14 @@ TQ.showMedia = function(link, user) {
     var modal = $('#media-modal');
     $('#media-modal-body').html(TQ.SPINNER);
 
+    // details link
+    $('#media-modal .media-details-link').attr('href', TQ.UriBase + 'media/' + uuid);
+
     // fetch details
     var uri = TQ.APIBase + '/media/' + uuid + '/keywords'; 
     $.getJSON(uri, function(resp) {
         //console.log(resp);
-        var details = 'Key words: <pre>' + resp.keywords.slice(0,10).join("\n") + '</pre>';
+        var details = 'Key words: <ul class="tq-keywords"><li>' + resp.keywords.slice(0,10).join("</li><li>") + '</li></ul>';
         $('#media-modal-body').html(details);
     });    
 

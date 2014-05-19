@@ -182,6 +182,7 @@ sub get_file {
 
 sub transcript_as_text {
     my $self = shift;
+    my $columns = shift || 72;
     return '' unless $self->transcript;
     my $decoded     = decode_json( $self->transcript );
     my $words_array = $decoded->{words};
@@ -202,6 +203,7 @@ sub transcript_as_text {
 
     #dump \@buf;
 
+    local $Text::Wrap::columns = $columns;
     return sprintf( "%s\n", wrap( '', '', @buf ) );
 }
 
