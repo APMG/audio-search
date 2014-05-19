@@ -17,25 +17,29 @@ sub auto : Private {
 
     my $api_key = $c->req->params->{tq};
 
-    if ( !$api_key ) {
-        $c->res->header( 'X-TQ' => 'missing tq API key' );
-        $self->status_forbidden( $c, message => 'Permission denied' );
-        return 0;
+    # find and stash the user, using either basic auth or api_key
+    if ($api_key) {
+        my $user = try {
+            $c->model('User')->fetch( api_key => $api_key );
+        }
+        catch {
+            $c->res->header( 'X-TQ' => 'invalid API key' );
+            $self->status_forbidden( $c, message => 'Permission denied' );
+            return 0;
+        } or return 0;
+
+        $c->log->debug( 'valid api request for ' . $user->email );
+        $c->stash( user => $user );
+        return 1;
+    }
+    else {
+        # basic auth
+        $c->authenticate( {}, "tqapp" );
+        $c->stash( user => $c->user->user, );
+        return 1;
     }
 
-    # find and stash the user
-    my $user = try {
-        $c->model('User')->fetch( api_key => $api_key );
-    }
-    catch {
-        $c->res->header( 'X-TQ' => 'invalid API key' );
-        $self->status_forbidden( $c, message => 'Permission denied' );
-        return 0;
-    } or return 0;
-
-    $c->log->debug( 'valid api request for ' . $user->email );
-    $c->stash( user => $user );
-    return 1;
+    return 0;
 }
 
 # determine response type from URL file extension

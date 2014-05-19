@@ -14,11 +14,10 @@
 
   <link rel="stylesheet" href="[% c.uri_for('/static/tq.css') %]">
 
-  [% IF title.defined %] 
-  <title>[% title %] :: [% c.config.name %]</title> 
-  [% ELSE %]
-  <title>[% c.config.name %]</title>
+  [% IF !title.defined %] 
+      [% title = 'Transcript Queue' %]
   [% END %]
+  <title>[% title %] :: [% c.config.name %]</title> 
 
   <!-- load in header since in-line scripts depend on it -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>

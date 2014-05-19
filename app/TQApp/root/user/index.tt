@@ -46,7 +46,7 @@
 
 <script type="text/javascript">
     $(document).ready( function() {
-        TQ.User = { guid:'[% user.guid %]', key:'[% user.api_key %]' };
+        TQ.User = { guid:'[% user.guid %]', name:'[% user.name | html %]' };
         TQ.getMedia( $('#media .panel-body') );
     });
 </script>

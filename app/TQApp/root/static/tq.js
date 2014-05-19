@@ -33,7 +33,7 @@ TQ.getMedia = function(el, user) {
     }
 
     // pull all the media for the user
-    var mediaUri = TQ.APIBase + '/user/' + user.guid + '/media/?cxc-order=updated_at+DESC&tq=' + user.key;
+    var mediaUri = TQ.APIBase + '/user/' + user.guid + '/media/?cxc-order=updated_at+DESC';
     $.getJSON(mediaUri, function(resp) {
         //console.log(resp); 
         var media = '<table class="table table-striped">';
@@ -51,7 +51,10 @@ TQ.getMedia = function(el, user) {
         el.html(media);
 
         // reload again in 30 seconds
-        setTimeout( function() { TQ.getMedia(el,user) }, 30000);
+        setTimeout( function() { 
+            el.html(TQ.SPINNER);
+            TQ.getMedia(el,user);
+        }, 30000);
     });
 
 }
@@ -113,7 +116,7 @@ TQ.showMedia = function(link, user) {
     $('#media-modal-body').html(TQ.SPINNER);
 
     // fetch details
-    var uri = TQ.APIBase + '/media/' + uuid + '/keywords?tq=' + user.key; 
+    var uri = TQ.APIBase + '/media/' + uuid + '/keywords'; 
     $.getJSON(uri, function(resp) {
         //console.log(resp);
         var details = 'Key words: <pre>' + resp.keywords.slice(0,10).join("\n") + '</pre>';
