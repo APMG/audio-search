@@ -1,0 +1,20 @@
+[% USE Autoformat %]
+<h2>Media: [% media.name || media.uuid %]</h2>
+
+<div id="media" class="panel panel-default">
+ <div class="panel-heading">
+  <h4>[% media.uuid %]</h4>
+ </div>
+ <div class="panel-body">
+  <table class="table table-striped">
+   <tr><th>Name</th><td>[% media.name | html %]</td></tr>
+   <tr><th>UUID</th><td>[% media.uuid %]</td></tr>
+   <tr><th>Created</th><td>[% media.created_at %]</td></tr>
+   <tr><th>Updated</th><td>[% media.updated_at %]</td></tr>
+   <tr><th>Status</th><td>[% media.nice_status() %]</td></tr>
+   <tr><th>URI</th><td>[% media.uri %]</td></tr>
+   <tr><th>Transcript</td><td>[% media.transcript_as_text() | Autoformat %]</td></tr>
+   <tr><th>Keywords</th><td><pre>[% media.keywords().join("\n") %]</pre></td></tr>
+  </table>
+ </div>
+</div>

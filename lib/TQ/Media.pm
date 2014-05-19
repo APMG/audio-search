@@ -12,6 +12,11 @@ use Audio::Scan;
 use JSON;
 use Text::Wrap;
 
+my %NICE_STATUS = (
+    A => 'In Process',
+    C => 'Complete',
+);
+
 __PACKAGE__->meta->setup(
     table   => 'media',
     columns => [
@@ -176,7 +181,8 @@ sub get_file {
 }
 
 sub transcript_as_text {
-    my $self        = shift;
+    my $self = shift;
+    return '' unless $self->transcript;
     my $decoded     = decode_json( $self->transcript );
     my $words_array = $decoded->{words};
     my @buf         = ();
@@ -203,6 +209,11 @@ sub keywords {
     my $self = shift;
     my $text = $self->transcript_as_text;
     return TQ::Utils::extract_keywords($text);
+}
+
+sub nice_status {
+    my $self = shift;
+    return $NICE_STATUS{ $self->status };
 }
 
 1;
