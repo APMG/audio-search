@@ -36,7 +36,7 @@ sub send_account_email {
         if $c->debug;
     my %email = (
         to       => $user->email,
-        from     => $c->config->{email_from},
+        from     => TQ::Config::email_from(),
         subject  => $c->config->{name} . ' account details',
         template => 'user_account.tt',
     );

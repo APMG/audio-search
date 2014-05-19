@@ -8,6 +8,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 use TQ::Media;
+use TQ::Utils;
 use JSON;
 use Getopt::Long;
 use Pod::Usage;
@@ -43,6 +44,14 @@ if ( $json and decode_json($json) ) {
     $media->transcript($json);
     $media->status('C');    # complete
     $media->save();
+    TQ::Utils::send_email(
+        to              => $media->owner->email,
+        from            => TQ::Config::email_from(),
+        subject         => 'Transcript ' . $media->uuid . ' complete',
+        tmpl            => 'transcript_complete.tt',
+        media           => $media,
+        server_base_uri => TQ::Config::get_server_base_uri(),
+    );
 }
 else {
     die sprintf( "Failed to create JSON transcript for: %s\n", $media->uri );

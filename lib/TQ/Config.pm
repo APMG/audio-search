@@ -94,4 +94,8 @@ sub get_audio_json_path {
     return dir($p);
 }
 
+sub email_from {
+    return get_profile_value('email_from') || 'no-reply@nosuchemail.org';
+}
+
 1;

@@ -26,7 +26,7 @@ sub send_confirmation_email {
         if $c->debug;
     my %email = (
         to       => $user->email,
-        from     => $c->config->{email_from},
+        from     => TQ::Config::email_from(),
         subject  => $c->config->{name} . ' account confirmation',
         template => 'user_confirmation.tt',
     );

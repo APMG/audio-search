@@ -246,4 +246,28 @@ sub extract_keywords {
 
 }
 
+sub send_email {
+    require Template;
+    require Email::Sender::Simple;
+    require Email::Simple;
+    require Email::Simple::Creator;
+
+    my %email    = @_;
+    my $tmpl     = delete $email{tmpl} or confess "tmpl name required";
+    my $tmpl_dir = TQ::Config::get_app_root->subdir('app/TQApp/root/email');
+    my $template = Template->new( { INCLUDE_PATH => "$tmpl_dir" } );
+    my $body     = '';
+    $template->process( $tmpl, \%email, \$body )
+        or confess $template->error();
+    my $email = Email::Simple->create(
+        header => [
+            To      => delete $email{to},
+            From    => TQ::Config::email_from(),
+            Subject => delete $email{subject},
+        ],
+        body => $body,
+    );
+    Email::Sender::Simple->send($email);
+}
+
 1;

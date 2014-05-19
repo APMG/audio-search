@@ -1,0 +1,7 @@
+Hi, [% media.owner.name %].
+
+Your transcript for [% media.name || media.uuid %] is now complete and can be viewed at:
+
+[% server_base_uri %]/media/[% media.uuid %]
+
+Thanks.
