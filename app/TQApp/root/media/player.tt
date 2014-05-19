@@ -1,0 +1,169 @@
+[% PlayerRoot = 'http://common.publicradio.org/media_player/1.4.0' %]
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!-- Consider adding a manifest.appcache: h5bp.com/d/Offline -->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <title>APM Media Player - Preview Player</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=0.941176471, maximum-scale=1, user-scalable=no" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <!-- This is the base CSS theme for the APM Media Player -->
+    <link href="[% PlayerRoot %]/skin/apmplayer_base.css" rel="stylesheet" type="text/css" />
+    <link href="[% c.uri_for('/static/player-override.css') %]" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="[% PlayerRoot %]/skin/jquery-ui-slider.custom.css" type="text/css" media="all" />
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="[% PlayerRoot %]/script/lib/jquery-ui-slider.custom.min.js"></script>
+    <script type="text/javascript" src="[% PlayerRoot %]/script/lib/modernizr-2.5.3-custom.min.js"></script>
+    <script type="text/javascript" src="[% PlayerRoot %]/script/lib/soundmanager2-jsmin.js"></script>
+    <script type="text/javascript" src="[% PlayerRoot %]/script/apmplayer-all.min.js"></script>
+
+    <!-- This script initializes the audio player, sets the intial volume and defines default player options -->
+    <script type="text/javascript">
+
+        function trim_text(txt) {
+            if (txt.length > 120) {
+                var dot = txt.indexOf('.');
+                if (dot <= 120) {
+                    return txt.substr(0,dot);
+                }
+                else {
+                    return txt.substr(0,120) + '...';
+                }
+            }
+            return txt;
+        }
+
+        $(document).ready(function(){
+            $('#apm_media_wrapper').apmplayer_ui({
+                settings : {
+                    fetchMetadata : false,
+                    autoplay : false
+                },
+                playables : [{ 
+                    duration:[% media.duration || 0 %], 
+                    http_file_path:'[% media.uri %]', 
+                    type:'audio', 
+                    identifier:'[% media.uuid %]' 
+                }],
+                onPlaylistUpdate : function (playable) {
+                    console.log(playable);
+                    if($('#apm_playlist li[ id = \'' + playable.identifier + '\']').length == 0) {   //create playlist item li + click handler if none exists.
+                        $('#apm_playlist ul').append('<li id="' + playable.identifier + '" class="apm_playlist_item"></li>');
+
+                        $('#apm_playlist li[ id = \'' + playable.identifier + '\']').click(function () {
+                            $('#apm_player_container').apmplayer_ui('gotoPlaylistItem', this.id);
+                        });
+                    }
+                    var snippet = '';
+                    if (playable.program !== '') {
+                        snippet += '<div class="apm_playlist_item_title">' + playable.program + '</div>';
+                    }
+                    if (playable.title !== '') {
+                         snippet += '<div class="apm_playlist_item_info">' + playable.title + '</div>';
+                    } else if (playable.description !== '') {
+                         snippet += '<div class="apm_playlist_item_info">' + playable.description + '</div>';
+                    }
+
+                    $('#apm_playlist li[ id = \'' + playable.identifier + '\']').html(snippet);
+
+                    if (playable.title !== ''
+                            && playable.title.indexOf("null - American Public Media") === -1) {
+                        var snippet = "";
+                        if (playable.program !== '') {
+                            snippet += "<h2>"+trim_text(playable.program)+"</h2>";
+                        }
+                        if (playable.title !== '') {
+                            snippet += "<p class='apm-track-info'>"+trim_text(playable.title)+"</p>";
+                        }
+                        $('#apm_media_meta').html(snippet);
+                    }
+
+                },
+                XXonMetadata : function (playable) {
+                    //console.log(playable);
+                    if (playable.title !== ''
+                            && playable.title.indexOf("null - American Public Media") === -1) {
+                        var snippet = "";
+                        if (playable.program !== '') {
+                            snippet += "<h2>"+playable.program+"</h2>";
+                        }
+                        if (playable.title !== '') {
+                            snippet += "<p class='apm-track-info'>"+playable.title+"</p>";
+                        }
+                        //snippet += '&copy; American Public Media';
+                        $('#apm_media_meta').html(snippet);
+                    }
+                }
+            });
+        });
+
+    </script>
+
+</head>
+<body>
+  <div id="apm_media_meta"></div>
+  <div id="apm_media_player">
+<!-- Prompt IE 6 users to install Chrome Frame. -->
+<!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+
+    <div id="apm_media_wrapper" class="clearfix preroll-inactive">
+
+<!-- BEGIN Player Container: Contains current track's meta info and player control interface -->
+        <div id="apm_player_container" class="rounded box clearfix">
+            <div id="apm_player_status" class="rounded"></div>
+            <!--
+            <div id="apm_player_info"></div>
+            -->
+            <!--
+            <div id="apm_sponsor_overlay" class="rounded transition">
+                <div id="apm_sponsor_overlay_info" class="rounded">
+                    <span id="apm_sponsor_overlay_time">&nbsp;</span>
+                </div>
+            </div>
+            -->
+
+            <div id="apm_player_controls" class="volume playtime">
+                <div id="apm_player_toggle">
+                    <div id="apm_player_play" class="player-toggle hide-text">
+                        Play
+                    </div>
+                    <div id="apm_player_pause" class="player-toggle hide-text">
+                        Pause
+                    </div>
+                    <div id="apm_player_bar_wrapper">
+                        <div id="apm_player_bar_container" class="rounded">
+                            <div id="apm_player_bar">
+                                <div id="apm_player_buffer" class="rounded4"></div>
+                            </div>
+                            <div id="apm_player_bar_position_popup"></div>
+                        </div>
+
+                        <div id="apm_player_playtime">[% media.duration_as_hms %]</div>
+                    </div>
+
+                    <div id="apm_player_volume_wrapper">
+                        <div id="apm_player_volume_status"></div>
+                      <!--
+                        <div id="apm_player_volume_slider_wrapper">
+                            <div id="apm_player_volume_slider_container" class="rounded">
+                                <div id="apm_volume_bar"></div>
+                            </div>
+                        </div>
+                       -->
+                    </div>
+                </div>
+            </div>
+        </div>
+<!-- END Player Container -->
+    </div>
+  </div>
+</body>
+</html>

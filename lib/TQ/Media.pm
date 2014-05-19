@@ -223,4 +223,10 @@ sub nice_status {
     return $NICE_STATUS{ $self->status };
 }
 
+sub duration_as_hms {
+    my $self = shift;
+    my $ms = $self->duration || 0;
+    return TQ::Utils::ms2hms($ms);
+}
+
 1;

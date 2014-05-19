@@ -1,0 +1,66 @@
+/* APM Media Player Style - simple player bar for iframe */
+
+#apm_media_meta {
+    font-size: 90%;
+    /* min-height: 80px; */ /* vertical placeholder for volume slider */
+    padding: 0 10px;
+    margin-top: 4px;
+    border: 1px solid #fff; /* HACK fix webkit (chrome, safari) adding space beneath */
+}
+
+#apm_media_player {
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    height: 34px;
+    position: relative;
+    width: auto;
+    border-top: none;
+}
+
+#apm_media_wrapper {
+    clear: none;
+    width: 250px;
+    padding:0;
+    margin: 0;
+    height: 34px;
+    position: absolute;
+}
+
+#apm_player_status {
+    margin-top: 0;
+}
+
+#apm_media_wrapper #apm_player_container {
+    width: 200px;
+    position: relative;
+}
+
+#apm_media_wrapper #apm_player_container #apm_player_controls {
+    width: 218px; 
+    margin: 0 auto;
+    position: relative;
+}
+
+#apm_media_wrapper #apm_player_container #apm_player_bar_wrapper {
+    width: 123px;
+}
+
+#apm_media_wrapper #apm_player_container #apm_player_bar_container {
+    width: 50px;
+}
+
+.box {
+    border: none;
+    box-shadow: none;
+    margin-bottom: 0;
+    padding: 0 8px;
+}
+    
+@media only screen and (max-width: 720px) {
+
+    #apm_player_info {
+        /* min-height: 80px; */
+        /* padding-top: 33px; */
+    }
+
+}
