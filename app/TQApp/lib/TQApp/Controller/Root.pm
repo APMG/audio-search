@@ -58,11 +58,14 @@ sub signup : Local {
     if ( uc $c->req->method eq 'POST' ) {
 
         # internal proxy to api.
-        # must bypass API authn check and mimic REST handling.
+        # must bypass API authn check and mimic REST handling,
+        # so we must manually do what dispatcher normally does.
         my $user_ctrl = $c->controller('V1::User');
-        my $begin = $user_ctrl->action_for('begin');
-        $begin->execute($user_ctrl, $c); 
+        my $begin     = $user_ctrl->action_for('begin');
+        $begin->execute( $user_ctrl, $c );
         $user_ctrl->zero_args_POST($c);
+        my $end = $user_ctrl->action_for('end');
+        $end->execute( $user_ctrl, $c );
     }
 }
 
