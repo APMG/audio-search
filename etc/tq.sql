@@ -79,6 +79,7 @@ create table if not exists media (
     transcript      mediumtext,
     uuid            char(36) not null,
     user_id         integer not null,
+    duration        integer, -- milliseconds
     PRIMARY KEY (`id`),
     UNIQUE KEY (`uuid`),
     CONSTRAINT `media_user_fk` foreign key (user_id) references users (id),

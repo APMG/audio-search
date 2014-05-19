@@ -32,6 +32,7 @@ __PACKAGE__->meta->setup(
             not_null => 1,
         },
         user_id    => { type => 'integer',  not_null => 1, },
+        duration   => { type => 'integer', },
         created_by => { type => 'integer',  not_null => 1 },
         updated_by => { type => 'integer',  not_null => 1 },
         created_at => { type => 'datetime', not_null => 1 },
@@ -113,6 +114,10 @@ sub transcribe {
     $debug and warn dump $scan->{info};
     $debug and warn sprintf( "length: %s\n",
         TQ::Utils::ms2hms( $scan->{info}->{song_length_ms} ) );
+
+    # remember the duration for player preview
+    $self->duration( $scan->{info}->{song_length_ms} );
+
     my $wav16k;
     if ( $scan->{info}->{samplerate} == 16000 ) {
         $wav16k = $file;
