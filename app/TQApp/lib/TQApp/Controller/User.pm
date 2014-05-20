@@ -47,7 +47,11 @@ sub send_account_email {
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
     $c->authenticate( {}, "tqapp" );
-    $c->stash( user => $c->user->user, template => 'user/index.tt' );
+    $c->stash(
+        user             => $c->user->user,
+        template         => 'user/index.tt',
+        has_media_player => TQ::Config::get_app_has_media_player(),
+    );
 }
 
 __PACKAGE__->meta->make_immutable;

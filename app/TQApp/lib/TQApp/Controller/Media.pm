@@ -23,9 +23,10 @@ sub index : Path : Args(1) {
     $c->authenticate( {}, "tqapp" );
     my $media = $self->get_media( $c, $uuid ) or return;
     $c->stash(
-        user     => $c->user->user,
-        media    => $media,
-        template => 'media/index.tt',
+        user             => $c->user->user,
+        media            => $media,
+        template         => 'media/index.tt',
+        has_media_player => TQ::Config::get_app_has_media_player(),
     );
 }
 

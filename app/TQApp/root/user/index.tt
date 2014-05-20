@@ -37,7 +37,9 @@
       <div class="modal-body" id="media-modal-body">
       </div>
       <div class="modal-footer">
+      [% IF has_media_player %]
         <iframe src="" scrolling="no" frameborder="0" seamless="seamless" width="230" height="45"></iframe>
+      [% END %]
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <a href="#" class="media-details-link btn btn-primary" role="button">View Details</a>
       </div>

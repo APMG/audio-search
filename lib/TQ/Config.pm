@@ -98,4 +98,8 @@ sub email_from {
     return get_profile_value('email_from') || 'no-reply@nosuchemail.org';
 }
 
+sub get_app_has_media_player {
+    return get_profile_value('app_has_media_player');
+}
+
 1;
