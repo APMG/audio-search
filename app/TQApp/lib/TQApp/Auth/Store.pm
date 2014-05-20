@@ -26,7 +26,7 @@ sub find_user {
     $c->log->debug('AuthStore: authenticating request') if $self->debug;
 
     my $email = $userinfo->{username};
-
+    $c->log->debug("AuthStore: looking for $email") if $self->debug;
     my $user = TQ::User->new( email => $email )->load_speculative;
 
     if ( !$user or $user->status ne 'A' ) {

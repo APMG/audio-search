@@ -3,19 +3,29 @@
 <div class="col-md-9" role="main">
 
  <div class="tq-docs-section">
-  <h1 id="overview" class="page-header">Overview</h1>
+  <h2 id="overview" class="page-header">Overview</h2>
   <p>
 
   </p>
  </div>
  <div class="tq-docs-section">
-  <h1 id="user" class="page-header">User</h1>
+  <h2 id="user" class="page-header">User</h2>
   <p>
-
+   <h3>Changing a password</h3>
+   <pre>
+# assuming bash shell
+% MYCREDS=`echo '<b>you@youremail.foo</b>:<b>oldpassword</b>' \
+  | perl -e 'use MIME::Base64; chomp(my $p = <>); print encode_base64($p, ""), $/;'`
+% curl -H "Authorization: Basic $MYCREDS" \
+   -X PUT \
+   -d '{"guid":"<b>yourguid</b>","pw":"<b>newpassword</b>"}' \
+   -H 'Content-Type: application/json' \
+   http://[% c.uri_for('/v1/user/<b>yourguid</b>') %]
+   </pre>
   </p>
  </div>
  <div class="tq-docs-section">
-  <h1 id="media" class="page-header">Media</h1>
+  <h2 id="media" class="page-header">Media</h2>
   <p>
 
   </p>
