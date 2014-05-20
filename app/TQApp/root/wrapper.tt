@@ -62,6 +62,9 @@
             -->
             </ul>
             <ul class="nav navbar-nav navbar-right">
+              [% IF user.defined %]
+              <li><a href="#">Welcome, [% user.name %]</a></li>
+              [% END %]
             <!--
               <li class="active"><a href="./">Default</a></li>
               <li><a href="../navbar-static-top/">Static top</a></li>
