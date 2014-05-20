@@ -11,6 +11,7 @@ use LWP::UserAgent;
 use Audio::Scan;
 use JSON;
 use Text::Wrap;
+use Search::Tools::UTF8;
 
 my %NICE_STATUS = (
     A => 'In Process',
@@ -189,7 +190,8 @@ sub transcript_as_text {
     my $self = shift;
     my $columns = shift || 72;
     return '' unless $self->transcript;
-    my $decoded     = decode_json( $self->transcript );
+    my $decoded
+        = decode_json( Encode::encode_utf8( to_utf8( $self->transcript ) ) );
     my $words_array = $decoded->{words};
     my @buf         = ();
     my @section     = ();
