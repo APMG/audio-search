@@ -1,0 +1,105 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use lib 'lib';
+use Path::Class;
+use TQ::Media;
+use Data::Dump qw( dump );
+use Array::Diff;
+use Text::FormatTable;
+use Getopt::Long;
+use Pod::Usage;
+
+my $transcriptifier = 'bin/audio-json2text';
+my $help            = 0;
+my $debug           = 0;
+my $START;
+my $END;
+my $TOP = 50;
+GetOptions(
+    'help'              => \$help,
+    'transcriptifier=s' => \$transcriptifier,
+    'start=i'           => \$START,
+    'end=i'             => \$END,
+    'top=i'             => \$TOP,
+    'debug'             => \$debug,
+) or pod2usage(2);
+pod2usage(1) if $help;
+
+pod2usage(1) unless ( $START and $END );
+
+=head1 NAME
+
+eval-transcripts - compare TQ-generated transcripts against a baseline
+
+=head1 SYNOPSIS
+
+ eval-transcripts --start 1 --end 10 --top 50 --transcriptifier bin/audio-json2text
+
+=cut
+
+my $perl = $^X;
+my $medias = TQ::Media->fetch_all( query => [ id => [ $START .. $END ] ] );
+
+my %report;
+for my $media (@$medias) {
+    my $tq_kw = $media->keywords;
+    next unless @$tq_kw;
+    my $wav           = $media->uri;
+    my $name          = file($wav)->basename;
+    my $baseline_file = $wav;
+    $baseline_file =~ s/\.wav$/\.txt/;
+    my $baseline_text = `$perl $transcriptifier $baseline_file`;
+    my $baseline_kw   = TQ::Utils::extract_keywords($baseline_text);
+
+    my $idx   = 0;
+    my %terms = map { $_ => $idx++ } @$baseline_kw;
+    my $i     = 0;
+    for my $t (@$tq_kw) {
+        if ( exists $terms{$t} ) {
+            $report{$name}->{common_terms}++;
+
+            # is $t in the top $i in youtube too?
+            if ( $i < $TOP ) {
+                $report{$name}->{top_any}++;
+                if ( $terms{$t} < $TOP ) {
+                    $report{$name}->{top_terms}++;
+                }
+            }
+        }
+        $report{$name}->{total_tq}++;
+        $i++;
+    }
+    $report{$name}->{total_baseline} = scalar @$baseline_kw;
+
+    my $diff = Array::Diff->diff( $baseline_kw, $tq_kw );
+    $report{$name}->{diff} = {
+        count       => $diff->count,
+        in_tq       => $diff->added,
+        in_baseline => $diff->deleted,
+    };
+}
+
+$debug and dump \%report;
+
+my $table = Text::FormatTable->new(' r | r | r | r | r | r ');
+$table->head(
+    'filename', 'total-(base)', 'total-(TQ)', 'common-%',
+    $TOP . '-top-same-%',
+    $TOP . '-top-any-%',
+);
+$table->rule('=');
+for my $name ( sort keys %report ) {
+    my $total_y = $report{$name}->{total_baseline};
+    my $total_c = $report{$name}->{total_tq};
+    my $common  = $report{$name}->{common_terms};
+    my $top     = $report{$name}->{top_terms};
+    my $top_any = $report{$name}->{top_any};
+    $table->row(
+        $name, $total_y, $total_c,
+        int( ( $common / $total_y ) * 100 ),
+        int( ( $top / $TOP ) * 100 ),
+        int( ( $top_any / $TOP ) * 100 )
+    );
+}
+print $table->render(70);

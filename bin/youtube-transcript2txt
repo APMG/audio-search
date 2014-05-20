@@ -17,6 +17,10 @@ my @words = ();
 for my $line (@buf) {
     $line = $asciifier->convert( to_utf8($line) );
     $line =~ s/\d+:\d+:\d+\.\d+,\d+:\d+:\d+\.\d+//g;
+
+    # 00:00:00,240 --> 00:00:03,110
+    $line =~ s/\d+:\d+:\d+[\.,]\d+ \-\-> \d+:\d+:\d+[\.,]\d+//g;
+
     $line =~ s/\r//g;
     push @words, $line if length $line;
 }
