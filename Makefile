@@ -23,8 +23,11 @@ deps:
 installdeps: 
 	cd app && make installdeps
 
-deploy: schema htaccess symlinks 
+deploy: schema htaccess symlinks perms
 
 install: deploy
+
+perms:
+	chmod 755 bin/mk-transcript
 	
-.PHONY: test schema htaccess deploy symlinks 
+.PHONY: test schema htaccess deploy symlinks perms
