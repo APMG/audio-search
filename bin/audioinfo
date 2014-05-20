@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use lib 'lib';
+use Audio::Scan;
+use Data::Dump qw( dump );
+use Getopt::Long;
+use Pod::Usage;
+use TQ::Utils;
+
+my $help;
+my $info = 1;
+my $tags;
+GetOptions(
+    'help' => \$help,
+    'tags' => \$tags,
+    'info' => \$info,
+) or pod2usage(2);
+pod2usage(1) if $help;
+
+for my $file (@ARGV) {
+    printf( "%s\n", $file );
+    my $scan = Audio::Scan->scan($file);
+    if ($info) {
+        delete $scan->{info}->{xing_toc};    # noise
+        dump $scan->{info};
+        my $ms = $scan->{info}->{song_length_ms};
+        printf( "hms length: %s\n", TQ::Utils::ms2hms($ms) );
+    }
+    if ($tags) {
+        dump $scan->{tags};
+    }
+}
+
