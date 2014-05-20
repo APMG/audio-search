@@ -20,7 +20,7 @@
    -X PUT \
    -d '{"guid":"<b>yourguid</b>","pw":"<b>newpassword</b>"}' \
    -H 'Content-Type: application/json' \
-   http://[% c.uri_for('/v1/user/<b>yourguid</b>') %]
+   [% c.uri_for('/v1/user/<b>yourguid</b>') %]
    </pre>
   </p>
  </div>
