@@ -33,7 +33,7 @@ TQ.getMedia = function(el, user) {
     }
 
     // pull all the media for the user
-    var mediaUri = TQ.APIBase + '/user/' + user.guid + '/media/?cxc-order=updated_at+DESC';
+    var mediaUri = TQ.APIBase + '/user/' + user.guid + '/media/?cxc-order=updated_at+DESC&cxc-page_size=10';
     $.getJSON(mediaUri, function(resp) {
         //console.log(resp); 
         var media = '<table class="table table-striped">';
@@ -48,6 +48,9 @@ TQ.getMedia = function(el, user) {
             media += row;
         });
         media += '</table>';
+
+        // TODO pager
+
         el.html(media);
 
         // reload again in 30 seconds
@@ -126,7 +129,7 @@ TQ.showMedia = function(link, user) {
     var uri = TQ.APIBase + '/media/' + uuid + '/keywords'; 
     $.getJSON(uri, function(resp) {
         //console.log(resp);
-        var details = 'Key words: <ul class="tq-keywords"><li>' + resp.keywords.slice(0,10).join("</li><li>") + '</li></ul>';
+        var details = '<h4>Keywords</h4> <ul class="tq-keywords"><li>' + resp.keywords.slice(0,10).join("</li><li>") + '</li></ul>';
         $('#media-modal-body').html(details);
     });    
 
