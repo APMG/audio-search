@@ -48,7 +48,7 @@ for my $media (@$medias) {
     my $wav           = $media->uri;
     my $name          = file($wav)->basename;
     my $baseline_file = $wav;
-    $baseline_file =~ s/\.wav$/\.txt/;
+    $baseline_file =~ s/\.\w+$/\.txt/;
     my $baseline_text = `$perl $transcriptifier $baseline_file`;
     my $baseline_kw   = TQ::Utils::extract_keywords($baseline_text);
 
