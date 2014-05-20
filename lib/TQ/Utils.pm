@@ -212,7 +212,7 @@ sub ms2hms {
 
 my $tagger = Lingua::EN::Tagger->new(
     lc                  => 1,
-    longest_noun_phrase => 5,
+    longest_noun_phrase => 10,
     weight_noun_phrases => 0,
 );
 my $asciifier = Search::Tools::Transliterate->new( ebit => 0 );
