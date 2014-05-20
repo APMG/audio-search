@@ -22,7 +22,11 @@ sub index : Path : Args(1) {
     my ( $self, $c, $uuid ) = @_;
     $c->authenticate( {}, "tqapp" );
     my $media = $self->get_media( $c, $uuid ) or return;
-    $c->stash( media => $media, template => 'media/index.tt' );
+    $c->stash(
+        user     => $c->user->user,
+        media    => $media,
+        template => 'media/index.tt',
+    );
 }
 
 sub player : Local : Args(1) {
