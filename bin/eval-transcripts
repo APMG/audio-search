@@ -82,13 +82,12 @@ for my $media (@$medias) {
 
 $debug and dump \%report;
 
-my $table = Text::FormatTable->new(' r | r | r | r | r | r ');
+my $table = Text::FormatTable->new('| r | r | r | r | r | r |');
 $table->head(
     'filename', 'total-(base)', 'total-(TQ)', 'common-%',
     $TOP . '-top-same-%',
     $TOP . '-top-any-%',
 );
-$table->rule('=');
 for my $name ( sort keys %report ) {
     my $total_y = $report{$name}->{total_baseline};
     my $total_c = $report{$name}->{total_tq};
