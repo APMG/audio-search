@@ -4,6 +4,7 @@ use base qw( TQApp::Base::Model::RDBO );
 use MRO::Compat;
 use mro 'c3';
 use Data::Dump qw( dump );
+use Carp;
 
 __PACKAGE__->config(
     name      => 'TQ::User',
@@ -32,6 +33,18 @@ sub create_related {
 
     # wrap it in a CXC Object
     return $self->object_class->new( delegate => $rel_obj );
+}
+
+sub make_query {
+    my $self = shift;
+    my $q = $self->next::method(@_);
+
+    # apply authz
+    my $c = $self->context;
+    my $user = $c->stash->{user} or confess "User required";
+    push @{ $q->{query} }, ( id => $user->id );
+
+    return $q; 
 }
 
 1;
