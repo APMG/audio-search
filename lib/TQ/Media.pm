@@ -120,16 +120,18 @@ sub transcribe {
     $self->duration( $scan->{info}->{song_length_ms} );
 
     my $wav16k;
-    if ( $scan->{info}->{samplerate} == 16000 ) {
+    my $is_mono = $scan->{info}->{channels} == 1 ? 1 : 0;
+    if ( $scan->{info}->{samplerate} == 16000 and $is_mono ) {
         $wav16k = $file;
     }
     elsif ( lc $ext eq 'mp3' ) {
-        TQ::Utils::run_it("lame --decode $file $base.wav");
-        TQ::Utils::run_it("sox $base.wav -r 16000 $base-16k.wav");
+        TQ::Utils::run_it( "lame --decode $file $base.wav", $debug );
+        TQ::Utils::run_it( "sox $base.wav -r 16000 -c 1 $base-16k.wav",
+            $debug );
         $wav16k = "$base-16k.wav";
     }
     elsif ( lc $ext eq 'wav' ) {
-        TQ::Utils::run_it("sox $file -r 16000 $base-16k.wav");
+        TQ::Utils::run_it( "sox $file -r 16000 -c 1 $base-16k.wav", $debug );
         $wav16k = "$base-16k.wav";
     }
     else {
