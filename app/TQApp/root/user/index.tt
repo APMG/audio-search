@@ -47,6 +47,7 @@
   </div>
 </div>
 
+<script src="[% c.uri_for('/static/wPaginate.js') %]"></script>
 <script type="text/javascript">
     $(document).ready( function() {
         TQ.User = { guid:'[% user.guid %]', name:'[% user.name | html %]' };

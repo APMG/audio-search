@@ -1,6 +1,6 @@
 <h2>Media: [% media.name || media.uuid %]</h2>
 
-[% IF has_media_player %]
+[% IF has_media_player && media.uri.match('^https?:') %]
 <iframe src="[% c.uri_for('/media/player/' _ media.uuid) %]" scrolling="no" frameborder="0" seamless="seamless" width="230" height="75"></iframe>
 [% END %]
 

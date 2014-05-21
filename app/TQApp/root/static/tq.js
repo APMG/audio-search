@@ -24,8 +24,9 @@ TQ.STATUS = {
 
 TQ.SPINNER = null;
 
-TQ.getMedia = function(el, user) {
+TQ.getMedia = function(el, user, pg) {
     if (!user) user = TQ.User;
+    if (!pg)   pg   = 1;
 
     // cache the contents of the 'loading' img/message the first time
     if (!TQ.SPINNER) {
@@ -33,12 +34,13 @@ TQ.getMedia = function(el, user) {
     }
 
     // pull all the media for the user
-    var mediaUri = TQ.APIBase + '/user/' + user.guid + '/media/?cxc-order=updated_at+DESC&cxc-page_size=10';
+    var mediaUri =  TQ.APIBase+'/media/search/';
+        mediaUri += '?cxc-minimal=1&cxc-order=updated_at+DESC&cxc-page_size=10&cxc-page='+pg;
     $.getJSON(mediaUri, function(resp) {
         //console.log(resp); 
         var media = '<table class="table table-striped">';
             media += '<tr><th>Name</th><th>URI</th><th>Status</th><th>Last Modified</th></tr>';
-        $.each(resp, function(idx, m) {
+        $.each(resp.results, function(idx, m) {
             //console.log(m);
             var n    = m.name ? m.name : m.uuid;
             var link = '<a href="#" data-uuid="'+m.uuid+'" onclick="TQ.showMedia($(this))">'+n+'</a>';
@@ -49,17 +51,41 @@ TQ.getMedia = function(el, user) {
         });
         media += '</table>';
 
-        // TODO pager
-
         el.html(media);
+        TQ.makeMediaPager(el, user, resp);  // call after .html() because it appends
 
         // reload again in 30 seconds
-        setTimeout( function() { 
-            el.html(TQ.SPINNER);
+        TQ.MEDIA_RELOADER = setTimeout( function() { 
+            //el.html(TQ.SPINNER);
             TQ.getMedia(el,user);
         }, 30000);
     });
 
+}
+
+TQ.makeMediaPager = function(parentEl, user, resp) {
+
+// http://getbootstrap.com/components/#pagination
+    console.log(resp);
+    var pgSize = parseInt(resp.query.limit);
+    var pager = '<div id="media-pager"></div>';
+    parentEl.append(pager);
+    $('#media-pager').wPaginate({
+        spread: 4,
+        total: parseInt(resp.count),
+        limit: pgSize,
+        index: parseInt(resp.query.offset),
+        theme: 'grey',
+        first: '|<',
+        last:  '>|',
+        url: function(idx) {
+            var newPg = idx+1;
+            clearTimeout(TQ.MEDIA_RELOADER); // reset reloader
+            parentEl.html(TQ.SPINNER);
+            TQ.getMedia(parentEl, user, newPg);
+        },  
+        ajax: true
+    });
 }
 
 TQ.createMedia = function(btn, el, user) {
@@ -123,7 +149,7 @@ TQ.showMedia = function(link, user) {
 
     // preview player
     var playerUri = TQ.UriBase + 'media/player/' + uuid;
-    $('#media-modal .modal-footer iframe').attr('src', playerUri);
+    var player = $('#media-modal .modal-footer iframe');
 
     // fetch details
     var uri = TQ.APIBase + '/media/' + uuid + '/keywords'; 
@@ -131,6 +157,15 @@ TQ.showMedia = function(link, user) {
         //console.log(resp);
         var details = '<h4>Keywords</h4> <ul class="tq-keywords"><li>' + resp.keywords.slice(0,10).join("</li><li>") + '</li></ul>';
         $('#media-modal-body').html(details);
+
+        // activate the player only if the media is http: accessible
+        if (resp && resp.uri && resp.uri.match(/^https?:/)) {
+            player.attr('src', playerUri);
+            player.show();
+        }
+        else {
+            player.hide();
+        }
     });    
 
     // show modal

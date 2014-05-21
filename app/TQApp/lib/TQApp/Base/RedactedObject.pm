@@ -16,7 +16,7 @@ around 'serialize' => sub {
 
     # make sure datetime stringifys as iso8601 with timezone
     for my $dtcol (qw( created_at updated_at )) {
-        if ( exists $hashref->{$dtcol} ) {
+        if ( defined $hashref->{$dtcol} ) {
             $hashref->{$dtcol} = parse_date( $hashref->{$dtcol} ) . "";
         }
     }

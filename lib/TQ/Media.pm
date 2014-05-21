@@ -148,7 +148,11 @@ sub transcribe {
         sprintf( "elapsed: %s\n", TQ::Utils::secs2hms( $end - $start ) );
     $debug and warn sprintf( "%s\n", join( "", @$out ) );
 
-    return $jsonfile->slurp;
+    my $json = $jsonfile->slurp;
+
+    # compact the json for storage
+    my $transcript = decode_json( Encode::encode_utf8( to_utf8($json) ) );
+    return encode_json($transcript);
 }
 
 sub get_json_file {

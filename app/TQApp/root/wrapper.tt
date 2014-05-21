@@ -12,6 +12,7 @@
   <!-- Optional theme -->
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 
+  <link rel="stylesheet" href="[% c.uri_for('/static/wPaginate.css') %]">
   <link rel="stylesheet" href="[% c.uri_for('/static/tq.css') %]">
 
   [% IF !title.defined %] 
