@@ -87,7 +87,7 @@
 		{
 			if(this.paginate) return this.paginate;
 
-			this.paginate = $('<div class="_wPaginate_holder _wPaginate_' + this.settings.theme + '"></div>');
+			this.paginate = $('<ul class="pagination"></ul>');
 
 			this.generateLinks();
 
@@ -127,8 +127,8 @@
 			{
 				var _self = this;
 
-				return $('<span class="_wPaginate_link ' + (key ? '_wPaginate_link_' + key : '') + '"></span>')
-				.html(this.settings[key] || (i+1))
+				return $('<li class="' + (key ? '' + key : '') + '"></li>')
+				.html('<a href="#">'+(this.settings[key] || (i+1))+'</a>')
 				.click(function()
 				{
 					_self.settings.index = i * _self.settings.limit;

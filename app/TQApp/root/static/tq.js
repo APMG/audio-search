@@ -75,9 +75,10 @@ TQ.makeMediaPager = function(parentEl, user, resp) {
         total: parseInt(resp.count),
         limit: pgSize,
         index: parseInt(resp.query.offset),
-        theme: 'grey',
-        first: '|<',
-        last:  '>|',
+        prev: null,
+        next: null,
+        //first: null,
+        //last: null,
         url: function(idx) {
             var newPg = idx+1;
             clearTimeout(TQ.MEDIA_RELOADER); // reset reloader
