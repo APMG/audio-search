@@ -9,7 +9,7 @@ PREFIX=$(dirname $0)
 AMDIR=$PREFIX/etc/am 
 LMBASE=$PREFIX/etc/lm/default
 JCONF=$PREFIX/etc/mjulius.jconf
-TMPDIR=/tmp
+TMPDIR=/var/extra/audio/work
 QUEUE=true
 WPAIR=false       # For improvement in accuracy, configure Julius with WPAIR=true (in install.sh) and set this to be true - runs much slower.
 BEAM=80.0         # Can be increased for improvement in accuracy.
