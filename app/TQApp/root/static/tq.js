@@ -55,10 +55,12 @@ TQ.getMedia = function(el, user, pg) {
         TQ.makeMediaPager(el, user, resp);  // call after .html() because it appends
 
         // reload again in 30 seconds
+        /*
         TQ.MEDIA_RELOADER = setTimeout( function() { 
             //el.html(TQ.SPINNER);
             TQ.getMedia(el,user);
         }, 30000);
+        */
     });
 
 }
@@ -81,7 +83,7 @@ TQ.makeMediaPager = function(parentEl, user, resp) {
         //last: null,
         url: function(idx) {
             var newPg = idx+1;
-            clearTimeout(TQ.MEDIA_RELOADER); // reset reloader
+            //clearTimeout(TQ.MEDIA_RELOADER); // reset reloader
             parentEl.html(TQ.SPINNER);
             TQ.getMedia(parentEl, user, newPg);
         },  
