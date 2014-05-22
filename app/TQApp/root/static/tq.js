@@ -104,6 +104,11 @@ TQ.createMedia = function(btn, el, user) {
         return;
     }
 
+    if (!uri.match(/\.(mp3|wav)$/i)) {
+        TQ.setAlert("URI must be a .mp3 or .wav", alerts);
+        return;
+    }
+
     // prevent multi-clicks
     btn.attr('disabled', true);
     btn.addClass('disabled');

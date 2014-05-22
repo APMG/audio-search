@@ -68,6 +68,9 @@ __PACKAGE__->meta->setup(
 sub insert {
     my $self = shift;
     $self->uuid( lc( create_uuid_as_string(UUID_V4) ) ) unless $self->uuid;
+    if ( $self->uri and $self->uri !~ m/\.(mp3|wav)$/i ) {
+        confess "URI must be .wav or .mp3";
+    }
     $self->SUPER::insert();
 }
 
