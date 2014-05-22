@@ -12,6 +12,7 @@ td.tq-uuid {
 
 td.tq-uri {
     word-wrap: break-word;
+    word-break: break-all;
     max-width: 100px;
 }
 
