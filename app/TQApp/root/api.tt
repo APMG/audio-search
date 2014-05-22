@@ -5,11 +5,24 @@
  <div class="tq-docs-section">
   <h2 id="overview" class="page-header">Overview</h2>
   <p>
-
+  The TQ (short for Transcript Queue) API provides basic REST services
+  to the queue and results.
+  There is a <a href="https://github.com/SPORE/specifications">SPORE description</a>
+  at <a href="[% c.uri_for('/v1') %]">the API root endpoint</a>.
   </p>
  </div>
  <div class="tq-docs-section">
   <h2 id="user" class="page-header">User</h2>
+  <table class="table table-striped">
+   <thead>
+    <tr>
+     <th>Method</th>
+     <th>Resource</th>
+     <th>Description</th>
+    </tr>
+   </thead>
+   <tbody id="user-api"></tbody>
+  </table>
   <p>
    <h3>Changing a password</h3>
    <pre>
@@ -26,6 +39,16 @@
  </div>
  <div class="tq-docs-section">
   <h2 id="media" class="page-header">Media</h2>
+  <table class="table table-striped">
+   <thead>
+    <tr>
+     <th>Method</th>
+     <th>Resource</th>
+     <th>Description</th>
+    </tr>
+   </thead>
+   <tbody id="media-api"></tbody>
+  </table>
   <p>
 
   </p>
@@ -41,3 +64,33 @@
   </ul>
  </div>
 </div>
+
+<script type="text/javascript">
+    function getDocRow(item) {
+        var row = '<tr>';
+            row += '<td>' + item.method + '</td>';
+            row += '<td>' + item.path   + '</td>';
+            row += '<td>' + item.description + '</td>';
+            row += '</tr>';
+        return row;
+    }
+    function buildDocs(resp) {
+        console.log(resp);
+        var apiTypes = ['user', 'media'];
+        $.each(apiTypes, function(i,type) {
+            var tbl = $('#'+type+'-api');
+            $.each(resp.methods.sort(function(a,b) { return a.path - b.path }), function(idx, item) {
+                //console.log(item);
+                var re = new RegExp('v1\/'+type);
+                if (!item.path.match(re)) {
+                    return;
+                }
+                var row = getDocRow(item);
+                tbl.append($(row));
+            });
+        });
+    }
+    $(document).ready(function() {
+        $.getJSON('[% c.uri_for('/v1') %]', buildDocs);
+    });
+</script>
