@@ -123,7 +123,12 @@ sub transcribe {
     $self->duration( $scan->{info}->{song_length_ms} );
 
     my $wav16k;
-    my $is_mono = $scan->{info}->{channels} == 1 ? 1 : 0;
+    my $is_mono = 1;
+    if ( defined $scan->{info}->{channels}
+        and $scan->{info}->{channels} != 1 )
+    {
+        $is_mono = 0;
+    }
     if ( $scan->{info}->{samplerate} == 16000 and $is_mono ) {
         $wav16k = $file;
     }
