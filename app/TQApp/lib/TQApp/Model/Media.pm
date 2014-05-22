@@ -34,6 +34,9 @@ sub search {
         if ( $c->req->params->{'cxc-minimal'} ) {
             $arg[0]->{select} = [qw( uuid name updated_at status uri )];
         }
+        if ( $c->req->params->{'cxc-select'} ) {
+            $arg[0]->{select} = $c->req->params->{'cxc-select'};
+        }
     }
 
     return $self->next::method(@arg);
