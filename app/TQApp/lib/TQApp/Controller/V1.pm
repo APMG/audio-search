@@ -60,7 +60,7 @@ sub index : Path {
                 description => 'create a new Media',
             },
             {   method      => 'PUT',
-                path        => '/v1/user/:uuid',
+                path        => '/v1/media/:uuid',
                 description => 'update an existing Media',
             },
             {   method      => 'DELETE',
