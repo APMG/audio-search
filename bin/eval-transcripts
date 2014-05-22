@@ -10,7 +10,7 @@ use Text::FormatTable;
 use Getopt::Long;
 use Pod::Usage;
 
-my $transcriptifier = 'bin/audio-json2text';
+my $transcriptifier = 'bin/audio-json2txt';
 my $help            = 0;
 my $debug           = 0;
 my $START;
