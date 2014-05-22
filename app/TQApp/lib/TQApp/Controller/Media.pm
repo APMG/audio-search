@@ -15,6 +15,11 @@ sub get_media {
         $c->res->status(404);
         return 0;
     } or return;
+    if ($media->owner->guid ne $c->user->user->guid) {
+        $c->stash( template => '403.tt' );
+        $c->res->status(403);
+        return 0;
+    }
     return $media;
 }
 
