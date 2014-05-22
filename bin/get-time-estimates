@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use lib 'lib';
+use TQ::Media;
+use Array::Average;
+use Text::FormatTable;
+
+my $table = Text::FormatTable->new('| r | r | r | r |');
+$table->head( 'name', 'duration', 'avg-runtime', 'ratio' );
+my $media_iter = TQ::Media->fetch_all_iterator();
+
+while ( my $m = $media_iter->next ) {
+    next unless $m->duration;
+
+    my $secs = $m->duration / 1000;
+
+    my $jobs = $m->jobs;
+    my @runtimes;
+    for my $job (@$jobs) {
+        push @runtimes, $job->complete_dtim->epoch - $job->start_dtim->epoch;
+    }
+    my $avg_secs = average(@runtimes);
+
+    my $ratio = ( $secs / $avg_secs );
+
+    $table->row(
+        $m->uuid,
+        TQ::Utils::secs2hms($secs),
+        TQ::Utils::secs2hms($avg_secs),
+        sprintf( '%0.02f', $ratio ),
+    );
+}
+
+print $table->render();
+
