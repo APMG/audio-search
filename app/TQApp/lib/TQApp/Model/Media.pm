@@ -15,7 +15,7 @@ __PACKAGE__->config(
 # feature so just load manually.
 my @load_with = qw( jobs owner );
 
-$ENV{CATALYST_DEBUG} = 2;    # trigger rdbo debug
+#$ENV{CATALYST_DEBUG} = 2;    # trigger rdbo debug
 
 sub fetch {
     my $self  = shift;
