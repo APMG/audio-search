@@ -18,6 +18,12 @@ my %NICE_STATUS = (
     C => 'Complete',
 );
 
+# from Audio::Scan
+my %AUDIO_FORMATS = (
+    1  => 'wav',
+    85 => 'wav-mp3',
+);
+
 __PACKAGE__->meta->setup(
     table   => 'media',
     columns => [
@@ -122,6 +128,7 @@ sub transcribe {
     # remember the duration for player preview
     $self->duration( $scan->{info}->{song_length_ms} );
 
+    my $format = $AUDIO_FORMATS{ $scan->{info}->{format} } || 'wav';
     my $wav16k;
     my $is_mono = 1;
     if ( defined $scan->{info}->{channels}
@@ -129,7 +136,10 @@ sub transcribe {
     {
         $is_mono = 0;
     }
-    if ( $scan->{info}->{samplerate} == 16000 and $is_mono ) {
+    if (    $scan->{info}->{samplerate} == 16000
+        and $is_mono
+        and $format eq 'wav' )
+    {
         $wav16k = $file;
     }
     elsif ( lc $ext eq 'mp3' ) {
@@ -139,6 +149,9 @@ sub transcribe {
         $wav16k = "$base-16k.wav";
     }
     elsif ( lc $ext eq 'wav' ) {
+        if ( $format ne 'wav' ) {
+            confess "File has .wav extension but is not a WAV format";
+        }
         TQ::Utils::run_it( "sox $file -r 16000 -c 1 $base-16k.wav", $debug );
         $wav16k = "$base-16k.wav";
     }
