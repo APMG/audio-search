@@ -20,11 +20,13 @@ $ENV{TQ_USE_MASTER} = 1;
 
 umask(0007);    # group rw, world null
 
-my $help  = 0;
-my $limit = 4;    # number of jobs per-host per-run
+my $lock_warning = 7200;    # only warn periodically. default is 2 hours
+my $help         = 0;
+my $limit        = 4;       # number of jobs per-host per-run
 GetOptions(
-    'help'    => \$help,
-    'limit=i' => \$limit,
+    'help'           => \$help,
+    'limit=i'        => \$limit,
+    'lock_warning=i' => \$lock_warning,
 ) or pod2usage(2);
 pod2usage(1) if $help;
 
@@ -47,9 +49,8 @@ if ( scalar(@$locked) ) {
 
     my $now = parse_date('now');
 
-    # only warn once-an-hour
     if (    $now->minute == 0
-        and $oldest->start_dtim->epoch < ( time() - 3600 ) )
+        and $oldest->start_dtim->epoch < ( time() - $lock_warning ) )
     {
         warn "Job Queue has been locked since " . $oldest->start_dtim;
     }
