@@ -37,7 +37,8 @@ run_it(
     $verb
 );
 
-# cmuseg goes in tools
+# cmuseg goes in tools, which may not exist
+run_it( "mkdir -p tools", $verb );
 run_it(
     sprintf(
         "cd tools && wget %s && tar xvfz %s",
