@@ -1,5 +1,5 @@
 help:
-	@echo 'make [ deps | test | xml | schema | deploy | mprstorydeps | mpstorytest | htacess | symlinks ]'
+	@echo 'make [ deps | installdeps | test | schema | install | htacess | symlinks ]'
 
 all: deps
 
@@ -22,6 +22,7 @@ deps:
 
 installdeps: 
 	cd app && make installdeps
+	perl bin/install-deps.pl
 
 deploy: schema htaccess symlinks perms
 
@@ -30,4 +31,4 @@ install: deploy
 perms:
 	chmod 755 bin/mk-transcript
 	
-.PHONY: test schema htaccess deploy symlinks perms
+.PHONY: test schema htaccess deploy symlinks perms deps installdeps

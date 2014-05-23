@@ -11,7 +11,7 @@ use Lingua::EN::Tagger;
 use Search::Tools::Transliterate;
 
 use base 'Exporter';
-our @EXPORT_OK = qw( logger parse_date random_str encrypt );
+our @EXPORT_OK = qw( run_it logger parse_date random_str encrypt );
 
 =head2 random_str([I<len>])
 
