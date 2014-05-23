@@ -22,17 +22,17 @@ sub get_sf_url {
 # models unpack into etc/
 run_it(
     sprintf(
-        "wget %s && tar xvfz %s",
-        get_sf_url($acoustic_model_pkg),
-        $acoustic_model_pkg
+        "wget -q %s && tar xvfz %s && rm %s",
+        get_sf_url($acoustic_model_pkg), $acoustic_model_pkg,
+        $acoustic_model_pkg,
     ),
     $verb
 );
 run_it(
     sprintf(
-        "wget %s && tar xvfz %s",
-        get_sf_url($language_model_pkg),
-        $language_model_pkg
+        "wget -q %s && tar xvfz %s && rm %s",
+        get_sf_url($language_model_pkg), $language_model_pkg,
+        $language_model_pkg,
     ),
     $verb
 );
@@ -41,8 +41,8 @@ run_it(
 run_it( "mkdir -p tools", $verb );
 run_it(
     sprintf(
-        "cd tools && wget %s && tar xvfz %s",
-        get_sf_url($cmuseg_pkg), $cmuseg_pkg
+        "cd tools && wget -q %s && tar xvfz %s && rm %s",
+        get_sf_url($cmuseg_pkg), $cmuseg_pkg, $cmuseg_pkg,
     ),
     $verb
 );

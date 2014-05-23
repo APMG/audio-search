@@ -1,3 +1,6 @@
 var/
 app/public_html/.htaccess
 etc/profiles.ini
+etc/am
+etc/lm
+tools/

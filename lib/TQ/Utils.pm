@@ -9,6 +9,7 @@ use Rose::DateTime::Util ();
 use Path::Class;
 use Lingua::EN::Tagger;
 use Search::Tools::Transliterate;
+use IPC::Cmd ();
 
 use base 'Exporter';
 our @EXPORT_OK = qw( run_it logger parse_date random_str encrypt );
