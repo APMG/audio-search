@@ -10,6 +10,7 @@ my $verb                  = 1;
 my $acoustic_model_pkg    = 'acoustic-model-0.9.tar.gz';
 my $language_model_pkg    = 'language-model-0.9.tar.gz';
 my $julius_adaptation_pkg = 'julius-adaptation-0.9.tar.gz';
+my $kaldi_models_pkg      = 'kaldi-models-0.9.tar.gz';
 
 sub get_sf_url {
     my $file = shift or die "file required";
@@ -33,6 +34,8 @@ sub install_from_sf {
 install_from_sf($acoustic_model_pkg);
 install_from_sf($language_model_pkg);
 install_from_sf($julius_adaptation_pkg);
+install_from_sf($kaldi_models_pkg);
 
-# run the cantab install script
-run_it( "sh install.sh", $verb );
+# run the cantab install scripts
+run_it( "sh install.sh",       $verb );
+run_it( "sh install-kaldi.sh", $verb );
