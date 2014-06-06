@@ -82,7 +82,7 @@ fi
 
 echo "Writing JSON output"
 cat $WORK/splitFiles.dbl | perl -ne '{chomp; print "'$WORK'/tmp-rec/$_\n"}' > $WORK/testSplit.dbl
-$PREFIX/scripts/glueJulius.pl $WORK/testSplit.dbl $WORK/log | sed "s:"$WORK/tmp-rec/"::" | $PREFIX/scripts/mlf2json.py > $OUTPUT
+$PREFIX/scripts/jul2json.pl $WORK/testSplit.dbl $WORK/log > $OUTPUT
 
 rm -rf $WORK
 echo "Done"

@@ -8,9 +8,9 @@ qqSplit() {
   local nmax=0
 
   if [ ! -z "$SGE_ROOT" ] ; then
-    local npart=40  # splits into no more than this number of jobs
+    local npart=40  # split into no more than this number of jobs
   else
-    local npart=8   # EDIT THIS - assumes a quad core machine
+    local npart=8   # EDIT THIS - assumes a hyperthreaded quad core machine
   fi
 
   if [ $1 = '-npart' ] ; then
@@ -66,6 +66,37 @@ qqSplit() {
   if echo $QUIET | egrep -q xtrace ; then set -x ; fi
 }
 
+qqList() {
+  local QUIET=$SHELLOPTS && set +x
+
+  local PREFIX=$1;
+  local DIR=`dirname $PREFIX`
+  local n;
+
+  source $DIR/qq.cfg
+  for(( n = 1; n <= $npart; n++)); do
+    echo $PREFIX$n
+  done
+
+  if echo $QUIET | egrep -q xtrace ; then set -x ; fi
+}
+
+qqCat() { 
+  local QUIET=$SHELLOPTS && set +x
+
+  local PREFIX=$1;
+  local DIR=`dirname $PREFIX`
+  local n;
+  
+  source $DIR/qq.cfg
+  for(( n = 1; n <= $npart; n++)); do
+    cat $PREFIX$n
+  done
+
+  if echo $QUIET | egrep -q xtrace ; then set -x ; fi
+}
+
+
 # runs an array job specified on the command line
 qqArray() {
   local QUIET=$SHELLOPTS && set +x
@@ -96,7 +127,7 @@ INIT=\`date +%s\`
 $CMD >& $DIR/qqArray.log-\$SGE_TASK_ID
 echo \`date +%s\` \$INIT - 1 + p | dc > $DIR/qqArray.time-\$SGE_TASK_ID
 EOF
-  chmod +x $DIR/qqArray.sh
+
   if [ ! -z "$SGE_ROOT" ] ; then
     qsub -p $QQPRIORITY $QARG $OPTS -terse -sync yes -cwd -j yes -r yes -o $DIR/qqArray.log -N `basename $path` -t 1-$npart $DIR/qqArray.sh | egrep -v "exited with exit code 0.$"
   else
@@ -126,7 +157,44 @@ EOF
     done | awk -v "old=$nmax" -v "n=$npart" '{t += $1} END{printf "Note, each item in a job should run in 5-30mins, average item time: %0.2f mins, suggest -nmax %0.0f\n",t/(60*n),0.5+(old*750*n/t)}'
   fi
  
+  #rm $DIR/qqArray.{sh,log,time}*
   find $DIR -name qqArray.sh\* -print0 -o -name qqArray.log\* -print0 -o -name qqArray.time\* -print0 | xargs -0 rm
+
+  if echo $QUIET | egrep -q xtrace ; then set -x ; fi
+}
+
+qqHERest() {
+  local QUIET=$SHELLOPTS && set +x
+
+  local ARGS=$1
+  local PREFIX=$2
+  local NPASS=$3
+  local DIR=`dirname $PREFIX`
+  local pass
+
+  for((pass = 0; $pass < $NPASS; pass++)); do
+    qqArray "$HTK/HERest -p \$SGE_TASK_ID -S $PREFIX\$SGE_TASK_ID $ARGS" $DIR
+    HERest -p 0 $ARGS HER*.acc
+    rm HER*.acc
+  done
+
+  if echo $QUIET | egrep -q xtrace ; then set -x ; fi
+}
+
+qqHMMIRest() {
+  local QUIET=$SHELLOPTS && set +x
+
+  local ARGS=$1
+  local PREFIX=$2
+  local NPASS=$3
+  local DIR=`dirname $PREFIX`
+  local pass
+
+  for((pass = 0; $pass < $NPASS; pass++)); do
+    qqArray "$HTK/HMMIRest -p \$SGE_TASK_ID -S $PREFIX\$SGE_TASK_ID $ARGS" $DIR
+    HMMIRest -p 0 $ARGS HDR*.acc.*
+    rm HDR*.acc.*
+  done
 
   if echo $QUIET | egrep -q xtrace ; then set -x ; fi
 }

@@ -7,9 +7,8 @@ use TQ::Utils qw( run_it );
 # download sf.net dependencies and install them
 
 my $verb               = 1;
-my $acoustic_model_pkg = 'acoustic-model-0.6.tar.gz';
-my $language_model_pkg = 'language-model-0.6.tar.gz';
-my $cmuseg_pkg         = 'CMUseg_0.5.tar.gz';
+my $acoustic_model_pkg = 'acoustic-model-0.9.tar.gz';
+my $language_model_pkg = 'language-model-0.9.tar.gz';
 
 sub get_sf_url {
     my $file = shift or die "file required";
@@ -36,18 +35,6 @@ run_it(
     ),
     $verb
 );
-
-# cmuseg goes in tools, which may not exist
-run_it( "mkdir -p tools", $verb );
-run_it(
-    sprintf(
-        "cd tools && wget -q %s && tar xvfz %s && rm %s",
-        get_sf_url($cmuseg_pkg), $cmuseg_pkg, $cmuseg_pkg,
-    ),
-    $verb
-);
-
-# NOTE cmuseg contains pre-compiled binaries, which at this point we trust.
 
 # run the cantab install script
 run_it( "sh install.sh", $verb );
