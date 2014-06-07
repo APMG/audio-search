@@ -13,7 +13,7 @@ APM partnered with [Cantab Research Limited](http://www.cantabresearch.com/) to 
 
 On CentOS 5 systems, the following RPMs are required to compile Kaldi:
 
- atlas-c++ atlas-c++-devel blas blas-devel lapack lapack-devel
+ atlas blas blas-devel lapack lapack-devel
 
 In addition, the SoX program is required. The TQ software has been tested with SoX v14.4.1.
 
