@@ -3,8 +3,8 @@ This is the second release of an Automatic Speech Recognition system built by Ca
 It uses the Julius decoder, which is downloaded and installed using:
 ./install.sh
 
-The speech recognition system is executed with the script cantabAPM.sh as follows: 
-./cantabAPM.sh <wavFile> <jsonFile>
+The speech recognition system is executed with the script julius-cantabAPM.sh as follows: 
+./julius-cantabAPM.sh <wavFile> <jsonFile>
 where <wavFile> is the audio file to be recognised and <jsonFile> is the output JSON file of the recognised text.
 
 The recognition runs on four cores; this can be adjusted in scripts/qq.sh, in the line: local npart=4
