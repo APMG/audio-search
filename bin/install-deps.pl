@@ -22,13 +22,19 @@ sub get_sf_url {
 
 sub install_from_sf {
     my $pkg = shift or die "package required";
-    run_it(
-        sprintf(
-            "wget -q %s && tar xvfz %s && rm %s",
-            get_sf_url($pkg), $pkg, $pkg,
-        ),
-        $verb
-    );
+    if ( -s $pkg ) {
+        warn "$pkg already exists in this dir. Unpacking it.\n";
+        run_it( "tar xvfz $pkg", $verb );    # do not remove
+    }
+    else {
+        run_it(
+            sprintf(
+                "wget -q %s && tar xvfz %s && rm %s",
+                get_sf_url($pkg), $pkg, $pkg,
+            ),
+            $verb
+        );
+    }
 }
 
 install_from_sf($acoustic_model_pkg);
@@ -38,4 +44,3 @@ install_from_sf($kaldi_models_pkg);
 
 # run the cantab install scripts
 run_it( "sh install.sh",       $verb );
-run_it( "sh install-kaldi.sh", $verb );
