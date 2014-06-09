@@ -9,10 +9,10 @@ TMPDIR=/var/extra/audio/work
 
 nj=8
 decode_nj=2
-QUEUE=true
+QUEUE=false
 
 if [ $# -ne 2 ] ; then
-  echo "syntax: recognizeAPM.sh <wavFile> <outputFile>" 
+  echo "syntax: $0 <wavFile> <outputFile>" 
   exit 1
 fi
 
@@ -93,4 +93,4 @@ done
 
 awk '{print $2}' $dataPrep/wav.scp | sed 's/.wav//g' > $WORK/tmp.scp
 scripts/kaldi2json.pl $WORK/tmp.scp $WORK/tmp.mlf > $OUTPUT
-rm -rf $WORK $decodeDir* exp/make_mfcc
+#rm -rf $WORK $decodeDir* exp/make_mfcc
