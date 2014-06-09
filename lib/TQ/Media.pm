@@ -12,6 +12,7 @@ use Audio::Scan;
 use JSON;
 use Text::Wrap;
 use Search::Tools::UTF8;
+use Try::Tiny;
 
 my %NICE_STATUS = (
     A => 'In Process',
@@ -126,7 +127,9 @@ sub transcribe {
         TQ::Utils::ms2hms( $scan->{info}->{song_length_ms} ) );
 
     # remember the duration for player preview
-    $self->duration( $scan->{info}->{song_length_ms} );
+    if ( defined $scan->{info}->{song_length_ms} ) {
+        $self->duration( $scan->{info}->{song_length_ms} );
+    }
 
     my $format = $AUDIO_FORMATS{ $scan->{info}->{format} } || 'wav';
     my $wav16k;
@@ -172,7 +175,15 @@ sub transcribe {
     my $json = $jsonfile->slurp;
 
     # compact the json for storage
-    my $transcript = decode_json( Encode::encode_utf8( to_utf8($json) ) );
+    my $transcript = try {
+        decode_json( Encode::encode_utf8( to_utf8($json) ) );
+    }
+    catch {
+        warn "Failed to decode JSON: $_\n";
+        warn "JSON: $json\n";
+        return 0;
+    };
+    return unless $transcript;
     return encode_json($transcript);
 }
 

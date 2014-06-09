@@ -13,7 +13,7 @@ use JSON;
 use Getopt::Long;
 use Pod::Usage;
 
-my $converter = "$FindBin::Bin/../cantabAPM.sh";
+my $converter = "$FindBin::Bin/../kaldi-cantabAPM.sh";
 my $help      = 0;
 my $force     = 0;
 my $debug     = 0;
