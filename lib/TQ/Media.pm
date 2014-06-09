@@ -165,7 +165,7 @@ sub transcribe {
     $jsonfile->parent->mkpath;
 
     my $start = time();
-    my $out   = TQ::Utils::run_it("$converter $wav16k $jsonfile");
+    my $out   = TQ::Utils::run_it("$converter $wav16k $jsonfile", $debug);
     my $end   = time();
     $debug
         and warn
