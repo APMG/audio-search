@@ -71,16 +71,18 @@ n=`cat $WORK/splitFiles.dbl | wc -l`
 seq $n | awk '{ printf("%05d\n", $1) }' > $dataPrep/nums
 cat -n $WORK/splitFiles.dbl | awk -v w=$WORK/tmp-rec '{ printf("%05d", $1); print " "w"/"$2".wav" }' > $dataPrep/wav.scp
 paste $dataPrep/nums $dataPrep/nums > $dataPrep/utt2spk
+
+# PATH is wonky so just run relative to our tools
+cd $PREFIX
 cat $dataPrep/utt2spk | sort -k 2 | utils/utt2spk_to_spk2utt.pl > $dataPrep/spk2utt
 
-echo "PATH==$PATH" >&2
 steps/make_mfcc.sh --nj $nj --cmd "$train_cmd" --mfcc-config exp/mfcc.conf $dataPrep exp/make_mfcc/test $WORK/mfcc
 steps/compute_cmvn_stats.sh $dataPrep exp/make_mfcc/test $WORK/mfcc
 decodeDir=exp/tri3/decode-$$
 steps/decode_fmllr.sh --nj $decode_nj --cmd "$decode_cmd" --skip_scoring true exp/tri3/graph $dataPrep $decodeDir 
 
 . $PATHSETTER
-lattice-1best "ark:gunzip -c $decodeDir/lat.*.gz|" ark:- | lattice-align-words $PREFIX/exp/lang/phones/word_boundary.int exp/tri3/final.mdl ark:- ark:- | nbest-to-ctm ark:- - | $PREFIX/utils/int2sym.pl -f 5 $PREFIX/exp/lang/words.txt > $WORK/timings.all.txt
+lattice-1best "ark:gunzip -c $decodeDir/lat.*.gz|" ark:- | lattice-align-words exp/lang/phones/word_boundary.int exp/tri3/final.mdl ark:- ark:- | nbest-to-ctm ark:- - | utils/int2sym.pl -f 5 exp/lang/words.txt > $WORK/timings.all.txt
 
 echo "#!MLF!#" > $WORK/tmp.mlf
 scale=10000000
@@ -94,4 +96,4 @@ done
 
 awk '{print $2}' $dataPrep/wav.scp | sed 's/.wav//g' > $WORK/tmp.scp
 scripts/kaldi2json.pl $WORK/tmp.scp $WORK/tmp.mlf > $OUTPUT
-#rm -rf $WORK $decodeDir* exp/make_mfcc
+rm -rf $WORK $decodeDir* exp/make_mfcc
