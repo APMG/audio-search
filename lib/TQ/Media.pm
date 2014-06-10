@@ -165,7 +165,7 @@ sub transcribe {
     $jsonfile->parent->mkpath;
 
     my $start = time();
-    my $out   = TQ::Utils::run_it("$converter $wav16k $jsonfile", $debug);
+    my $out   = TQ::Utils::run_it( "$converter $wav16k $jsonfile", $debug );
     my $end   = time();
     $debug
         and warn
@@ -244,6 +244,10 @@ sub transcript_as_text {
         else {
             push @section, $word;
         }
+    }
+
+    if ( !@buf ) {
+        @buf = ( join( ' ', @section ) );
     }
 
     #dump \@buf;
