@@ -30,6 +30,7 @@ while($dbl = <DBL>) {
     $init = $offset + ($1/$scale);
     $dur = ($2/$scale);
     $word = $3;
+    print "    {\n";
     print "      \"time\": \"$init\",\n";
     printf "      \"duration\": \"%.2f\",\n",$dur;
     print "      \"word\": \"$word\"\n";
