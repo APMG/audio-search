@@ -9,7 +9,7 @@ PATHSETTER=$PREFIX/set-kaldi-path.sh
 TMPDIR=/var/extra/audio/work
 
 nj=8
-decode_nj=4
+decode_nj=2
 QUEUE=false
 
 if [ $# -ne 2 ] ; then
