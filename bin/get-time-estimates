@@ -6,8 +6,8 @@ use TQ::Media;
 use Array::Average;
 use Text::FormatTable;
 
-my $table = Text::FormatTable->new('| r | r | r | r |');
-$table->head( 'name', 'duration', 'avg-runtime', 'ratio' );
+my $table = Text::FormatTable->new('| r | r | r | r | r |');
+$table->head( 'id', 'uri', 'duration', 'avg-runtime', 'ratio' );
 my $media_iter = TQ::Media->fetch_all_iterator();
 
 while ( my $m = $media_iter->next ) {
@@ -20,12 +20,17 @@ while ( my $m = $media_iter->next ) {
     for my $job (@$jobs) {
         push @runtimes, $job->complete_dtim->epoch - $job->start_dtim->epoch;
     }
+    next unless @runtimes;
     my $avg_secs = average(@runtimes);
 
     my $ratio = ( $secs / $avg_secs );
+    my $uri   = $m->uri;
+
+    # shorten to filename
+    $uri =~ s,.*/,,;
 
     $table->row(
-        $m->uuid,
+        $m->id, $uri,
         TQ::Utils::secs2hms($secs),
         TQ::Utils::secs2hms($avg_secs),
         sprintf( '%0.02f', $ratio ),
