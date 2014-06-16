@@ -1,0 +1,7 @@
+# example crontab for every host that processes the job queue
+TQ_ROOT=/opt/local/audio-search
+PATH=$TQ_ROOT:$TQ_ROOT/bin:/opt/local/bin:/usr/local/bin:/usr/bin:/bin
+
+# every minute check for new jobs
+* * * * *          perl $TQ_ROOT/bin/run-job-queue
+
