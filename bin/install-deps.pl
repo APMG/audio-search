@@ -10,7 +10,7 @@ my $verb                  = 1;
 my $acoustic_model_pkg    = 'acoustic-model-0.9.tar.gz';
 my $language_model_pkg    = 'language-model-0.9.tar.gz';
 my $julius_adaptation_pkg = 'julius-adaptation-0.9.tar.gz';
-my $kaldi_models_pkg      = 'kaldi-models-0.9.tar.gz';
+my $kaldi_models_pkg      = 'kaldi-models-1.0.tar.gz';
 
 sub get_sf_url {
     my $file = shift or die "file required";
