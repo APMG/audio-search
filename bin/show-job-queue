@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Getopt::Long;
+use Pod::Usage;
+use TQ::Config;
+use TQ::DBManager;
+
+umask(0007);
+
+my $help = 0;
+GetOptions( 'help' => \$help, ) or pod2usage(2);
+pod2usage(1) if $help;
+
+=pod
+
+=head1 NAME
+
+show-job-queue - display running and queued jobs
+
+=head1 SYNOPSIS
+
+ show-job-queue
+    -h --help
+
+=cut
+
+my $dbh  = TQ::DBManager->new();
+my $db   = $dbh->database();
+my $dom  = $dbh->domain();
+my $drv  = $dbh->driver();
+my $host = $dbh->host();
+my $pwd  = $dbh->password();
+my $port = $dbh->port();
+my $typ  = $dbh->type();
+my $usr  = $dbh->username();
+
+my %sqls = (
+    queued =>
+        'select cmd,created_at,start_dtim from job_queue where complete_dtim is null and start_dtim is  null',
+    running =>
+        'select cmd,created_at,start_dtim from job_queue where complete_dtim is null and start_dtim is not null',
+);
+
+for my $label ( sort keys %sqls ) {
+    my $sql = $sqls{$label};
+
+    # run the command
+    my $cmd = "mysql --user=$usr --password=$pwd --database=$db --host=$host "
+        . "--auto-rehash --default-character-set=utf8";
+    $cmd .= " --port=$port" if $port;
+    $cmd .= qq/ -e '$sql'/;
+
+    printf( "%s:\n", $label );
+    system($cmd) and die "$cmd failed with [$!]";
+}
