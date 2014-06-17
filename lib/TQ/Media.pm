@@ -17,6 +17,7 @@ use Try::Tiny;
 my %NICE_STATUS = (
     A => 'In Process',
     C => 'Complete',
+    F => 'Failed to process',
 );
 
 # from Audio::Scan

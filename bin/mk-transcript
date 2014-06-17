@@ -54,6 +54,8 @@ if ( $json and decode_json($json) ) {
     );
 }
 else {
+    $media->status('F');    # failed
+    $media->save();
     die sprintf( "Failed to create JSON transcript for: %s\n", $media->uri );
 }
 
