@@ -7,7 +7,6 @@ use lib "$FindBin::Bin/../lib";
 use Carp;
 use Data::Dump qw( dump );
 use TQ::Config;
-use File::Slurp;
 use Template;
 use URI;
 

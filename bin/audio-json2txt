@@ -4,7 +4,7 @@ use warnings;
 
 # CPAN modules
 use JSON;
-use File::Slurp;
+use File::Slurp::Tiny qw( read_file );
 use Text::Wrap;
 use Data::Dump qw( dump );
 

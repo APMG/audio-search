@@ -4,7 +4,7 @@ use warnings;
 
 # CPAN modules
 use JSON;
-use File::Slurp;
+use File::Slurp::Tiny qw( read_lines );
 use Text::Wrap;
 use Search::Tools::UTF8;
 use Search::Tools::Transliterate;
@@ -12,7 +12,7 @@ use Data::Dump qw( dump );
 
 my $asciifier = Search::Tools::Transliterate->new( ebit => 0 );
 my $file = shift(@ARGV) or die "$0 file.txt\n";
-my @buf = read_file( $file, chomp => 1 );
+my @buf = read_lines( $file, chomp => 1 );
 my @words = ();
 for my $line (@buf) {
     $line = $asciifier->convert( to_utf8($line) );

@@ -7,14 +7,14 @@
 
 use strict;
 use warnings;
-use File::Slurp;
+use File::Slurp::Tiny qw( read_lines );
 
 if ( !@ARGV ) {
     die "$0 file [...fileN]\n";
 }
 
 for my $file (@ARGV) {
-    my @buf = read_file($file);
+    my @buf = read_lines($file);
     my @new;
 
     for my $line (@buf) {

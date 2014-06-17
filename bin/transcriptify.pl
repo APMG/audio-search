@@ -7,10 +7,10 @@
 
 use strict;
 use warnings;
-use File::Slurp;
+use File::Slurp::Tiny qw( read_lines );
 
 my $file = shift or die "$0 file";
-my @buf = read_file($file);
+my @buf = read_lines($file);
 my @new;
 
 for my $line (@buf) {
