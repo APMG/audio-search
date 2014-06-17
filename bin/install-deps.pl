@@ -16,7 +16,7 @@ sub get_sf_url {
     my $file = shift or die "file required";
     return
         sprintf(
-        "https://downloads.sourceforge.net/project/apmaudiosearch/%s?use_mirror=master",
+        "https://downloads.sourceforge.net/project/apmaudiosearch/%s",
         $file );
 }
 
