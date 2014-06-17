@@ -1,48 +1,42 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use JSON;
+use File::Slurp::Tiny qw( read_file read_lines );
+
+my $usage = "$0 dbl_file mlf_file\n";
 
 # take a list of split MLF files from stdin in random order
 # and glue them back together in order specified.
 # For a single file.
 
-$scale = 10000000;
-
-open(DBL, $ARGV[0]) || die "did't open $ARGV[0]\n";
-$keep = $/;
-undef $/;
-open(MLF, $ARGV[1]) || die "did't open $ARGV[1]\n";
-$mlf = <MLF>;
-close(MLF);
-$/ = $keep;
-
-while($mlf =~ m/\"(.*?)\.rec\"\n(.*?)\n.\n/gs) {
-  $hash{$1} = $2;
+my $scale    = 10_000_000;
+my $dbl_file = shift(@ARGV) or die $usage;
+my $mlf_file = shift(@ARGV) or die $usage;
+my $mlf      = read_file($mlf_file);
+my %mlf_hash = ();
+while ( $mlf =~ m/\"(.*?)\.rec\"\n(.*?)\n.\n/gs ) {
+    $mlf_hash{$1} = $2;
 }
-print "{\n  \"words\": [\n";
-undef $base;
-$p = 1;
-while($dbl = <DBL>) {    
-  chomp $dbl;
-  $dbl =~ m/^(.*)-(\d+\.\d+)\+\d+\.\d+$/;
-  $stem = $1;
-  $offset = $2;
-  $n=0;
-  while($hash{$dbl} =~ m/(\d+)\s*(\d+)\s(.*?)\n/gs) {
-    $init = $offset + ($1/$scale);
-    $dur = ($2/$scale);
-    $word = $3;
-    print "    {\n";
-    print "      \"time\": \"$init\",\n";
-    printf "      \"duration\": \"%.2f\",\n",$dur;
-    print "      \"word\": \"$word\"\n";
-    if (($n == $hash{$dbl} =~ tr/\n// - 1) && ($p == (keys %hash))) {
-      print "    }\n";
-    } else {
-      print "    },\n";
+
+my @dbl_lines = read_lines($dbl_file);
+my @words     = ();
+for my $dbl (@dbl_lines) {
+    chomp $dbl;
+    my ( $stem, $offset ) = ( $dbl =~ m/^(.*)-(\d+\.\d+)\+\d+\.\d+$/ );
+    my $n = 0;
+    while ( $mlf_hash{$dbl} =~ m/(\d+)\s*(\d+)\s(.*?)\n/gs ) {
+        my $init = $offset + ( $1 / $scale );
+        my $dur  = ( $2 / $scale );
+        my $word = $3;
+        push @words,
+            {
+            'time'   => $init,
+            duration => sprintf( "%.2f", $dur ),
+            word     => $word,
+            };
     }
-    $n = $n + 1;
-  }
-    $p = $p + 1;
-  $base = $stem;
 }
-print "  ]\n}";
-exit 0;
+
+my $json = encode_json( { words => \@words } );
+print $json;

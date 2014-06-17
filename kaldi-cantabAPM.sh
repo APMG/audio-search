@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 # Written by Cantab Research Ltd for use by American Public Media (APM), June 2014.
 # Dependencies: Kaldi, CMUseg_0.5, sox
