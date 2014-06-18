@@ -4,7 +4,7 @@
 
 CHECKOUT_PATH=tools/kaldi-trunk
 
-if [ ! -d $(dirname $0)/$CHECKOUT ]; then
+if [ ! -d $(dirname $0)/$CHECKOUT_PATH ]; then
   ( cd tools
   svn export -r 4038 https://svn.code.sf.net/p/kaldi/code/trunk kaldi-trunk )
   n=4    # number of cpus
