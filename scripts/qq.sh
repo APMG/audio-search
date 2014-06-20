@@ -128,6 +128,8 @@ $CMD >& $DIR/qqArray.log-\$SGE_TASK_ID
 echo \`date +%s\` \$INIT - 1 + p | dc > $DIR/qqArray.time-\$SGE_TASK_ID
 EOF
 
+  chmod +x $DIR/qqArray.sh
+
   if [ ! -z "$SGE_ROOT" ] ; then
     qsub -p $QQPRIORITY $QARG $OPTS -terse -sync yes -cwd -j yes -r yes -o $DIR/qqArray.log -N `basename $path` -t 1-$npart $DIR/qqArray.sh | egrep -v "exited with exit code 0.$"
   else
