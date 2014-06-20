@@ -41,7 +41,7 @@ my %sqls = (
     queued =>
         'select cmd,created_at from job_queue where complete_dtim is null and start_dtim is  null',
     running =>
-        'select cmd,created_at,start_dtim,host from job_queue where complete_dtim is null and start_dtim is not null',
+        'select cmd,created_at,start_dtim,host,pid from job_queue where complete_dtim is null and start_dtim is not null',
 );
 
 for my $label ( sort keys %sqls ) {
