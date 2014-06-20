@@ -36,6 +36,7 @@ while($dbl = <DBL>) {
     $init = ($offset + 0.01 * $1);
     $quit = ($offset + 0.01 * ($2 + 1));
     $dur = ($quit - $init);
+    print "    {\n";
     print "      \"time\": \"$init\",\n";
     printf "      \"duration\": \"%6.2f\",\n", $dur;
     print "      \"word\": \"$4\",\n"  ;
