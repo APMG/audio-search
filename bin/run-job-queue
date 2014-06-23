@@ -20,9 +20,9 @@ $ENV{TQ_USE_MASTER} = 1;
 
 umask(0007);    # group rw, world null
 
-my $lock_warning = 7200;    # only warn periodically. default is 2 hours
+my $lock_warning = 3600 * 24;    # only warn periodically. default is 24 hours
 my $help         = 0;
-my $limit        = 4;       # number of jobs per-host per-run
+my $limit        = 4;            # number of jobs per-host per-run
 GetOptions(
     'help'           => \$help,
     'limit=i'        => \$limit,
