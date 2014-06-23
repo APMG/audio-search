@@ -1,55 +1,61 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use JSON;
+use File::Slurp::Tiny qw( read_file read_lines );
+
+my $usage = "$0 dbl_file mlf_file\n";
 
 # take a list of split MLF files from stdin in random order
 # and glue them back together in order specified.
+# For a single file.
 
-#$scale = 10000000;
+my $scale     = 10_000_000;
+my $dbl_file  = shift(@ARGV) or die $usage;
+my $mlf_file  = shift(@ARGV) or die $usage;
+my $mlf       = read_file($mlf_file);
+my @dbl_lines = read_lines($dbl_file);
 
-open(DBL, $ARGV[0]) || die "did't open $ARGV[0]\n";
-$keep = $/;
-undef $/;
-open(MLF, $ARGV[1]) || die "did't open $ARGV[1]\n";
-$mlf = <MLF>;
-close(MLF);
-$/ = $keep;
-
-while($mlf =~ m/input speechfile: (.*?)\.wav\n(.*?)\ncmscore1: (.*?)\n.*? ----------------------------------------\n(.*?\n)re-computed AM score:/gs) {
-  $hash{$1} = $4;
-  $confidences{$1} = $3; 
-  $misc{$1} = $2;
+my %mlf_hash    = ();
+my %confidences = ();
+my %misc;
+while ( $mlf
+    =~ m/input speechfile: (.*?)\.wav\n(.*?)\ncmscore1: (.*?)\n.*? ----------------------------------------\n(.*?\n)re-computed AM score:/gs
+    )
+{
+    my $filename = $1;
+    $mlf_hash{$filename}    = $4;
+    $confidences{$filename} = $3;
+    $misc{$filename}        = $2;
 }
-print "{\n  \"words\": [\n";
-undef $base;
-$p = 1;
-while($dbl = <DBL>) {    
-  chomp $dbl;
-  $dbl =~ m/^(.*)-(\d+\.\d+)\+\d+\.\d+$/;
-  $stem = $1;
-  $offset = $2;
 
-  @conf = split(/ /, $confidences{$dbl});
-  if ($misc{$dbl} =~ /00 _default: got no candidates, output 1st pass result as a final result/) {
-    s/0.000/undefined/ for @conf;
-  } 
-  $n=0;
-  while($hash{$dbl} =~ m/\[ *(\d+) +(\d+)\].*? +(.*?)  (.*?)\t/gs) {
-    $init = ($offset + 0.01 * $1);
-    $quit = ($offset + 0.01 * ($2 + 1));
-    $dur = ($quit - $init);
-    print "    {\n";
-    print "      \"time\": \"$init\",\n";
-    printf "      \"duration\": \"%6.2f\",\n", $dur;
-    print "      \"word\": \"$4\",\n"  ;
-    print "      \"confidence\": \"$conf[$n]\"\n" ;
-    if (($n == @conf-1) && ($p == (keys %hash))) {
-      print "    }\n";
-    } else {
-      print "    },\n";
+my @words = ();
+for my $dbl (@dbl_lines) {
+    chomp $dbl;
+    my ( $stem, $offset ) = ( $dbl =~ m/^(.*)-(\d+\.\d+)\+\d+\.\d+$/ );
+
+    my @conf = split( / /, $confidences{$dbl} );
+    if ( $misc{$dbl}
+        =~ /00 _default: got no candidates, output 1st pass result as a final result/
+        )
+    {
+        s/0.000/undefined/ for @conf;
     }
-    $n = $n + 1;
-  }
-    $p = $p + 1;
-  $base = $stem;
+    my $n = 0;
+    while ( $mlf_hash{$dbl} =~ m/\[ *(\d+) +(\d+)\].*? +(.*?)  (.*?)\t/gs ) {
+        my $init = ( $offset + 0.01 * $1 );
+        my $quit = ( $offset + 0.01 * ( $2 + 1 ) );
+        my $dur  = ( $quit - $init );
+        my $word = $4;
+        push @words,
+            {
+            'time'     => $init,
+            duration   => sprintf( "%6.2f", $dur ),
+            word       => $word,
+            confidence => $conf[ $n++ ],
+            };
+    }
 }
-print "  ]\n}";
-exit 0;
+
+my $json = encode_json( { words => \@words } );
+print $json;
