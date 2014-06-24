@@ -10,6 +10,8 @@ TMPDIR=/var/extra/audio/work
 
 nj=8
 decode_nj=2
+lmw=14.0
+amw=`echo $lmw | awk '{print 1/$1}'`
 QUEUE=false
 
 if [ $# -ne 2 ] ; then
@@ -64,6 +66,7 @@ cat $WORK/tmp-rec/$wavName.pem | egrep -v '^;;' | while read dummy chan spkr ini
   fi
 done
 
+echo "Preparing data"
 export LC_ALL=C
 dataPrep=$WORK/dataPrep
 mkdir -p $dataPrep
@@ -76,14 +79,14 @@ paste $dataPrep/nums $dataPrep/nums > $dataPrep/utt2spk
 cd $PREFIX
 cat $dataPrep/utt2spk | sort -k 2 | utils/utt2spk_to_spk2utt.pl > $dataPrep/spk2utt
 
-steps/make_mfcc.sh --nj $nj --cmd "$train_cmd" --mfcc-config exp/mfcc.conf $dataPrep exp/make_mfcc/test $WORK/mfcc
-steps/compute_cmvn_stats.sh $dataPrep exp/make_mfcc/test $WORK/mfcc
-decodeDir=exp/tri3/decode-$$
-steps/decode_fmllr.sh --nj $decode_nj --cmd "$decode_cmd" --skip_scoring true exp/tri3/graph $dataPrep $decodeDir 
+echo "Decoding"
+decodeDirF=exp/tri3/decode-$$
+decodeDir=exp/tri3_mmi_b0.1/decode-$$
+steps/decode_fmllr.sh --nj $decode_nj --cmd "$decode_cmd" --acwt $amw --skip_scoring true exp/tri3/graph $dataPrep $decodeDirF
+steps/decode.sh --transform-dir $decodeDirF --nj $decode_nj --cmd "$decode_cmd" --acwt $amw --skip_scoring true exp/tri3/graph $dataPrep $decodeDir
+lattice-1best --lm-scale=$lmw "ark:gunzip -c $decodeDir/lat.*.gz|" ark:- | lattice-align-words exp/lang/phones/word_boundary.int exp/tri3_mmi_b0.1/final.mdl ark:- ark:- | nbest-to-ctm ark:- - | utils/int2sym.pl -f 5 exp/lang/words.txt > $WORK/timings.all.txt
 
-. $PATHSETTER
-lattice-1best "ark:gunzip -c $decodeDir/lat.*.gz|" ark:- | lattice-align-words exp/lang/phones/word_boundary.int exp/tri3/final.mdl ark:- ark:- | nbest-to-ctm ark:- - | utils/int2sym.pl -f 5 exp/lang/words.txt > $WORK/timings.all.txt
-
+echo "Writing output"
 echo "#!MLF!#" > $WORK/tmp.mlf
 scale=10000000
 cat $dataPrep/wav.scp | while read line; do
@@ -96,4 +99,6 @@ done
 
 awk '{print $2}' $dataPrep/wav.scp | sed 's/.wav//g' > $WORK/tmp.scp
 scripts/kaldi2json.pl $WORK/tmp.scp $WORK/tmp.mlf > $OUTPUT
-rm -rf $WORK $decodeDir* exp/make_mfcc
+
+echo "Cleaning up"
+rm -rf $WORK $decodeDir* $decodeDirF* exp/make_mfcc
