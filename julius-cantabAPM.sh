@@ -74,9 +74,9 @@ if $QUEUE; then
   fi
 else
   if [ ! $WPAIR ]; then
-    $PREFIX/tools/julius-4.3.1/julius/julius -C $JCONF -bs $BEAM -walign -h $AMDIR/juliusBin.mmf -hlist $AMDIR/julius.tie -input file -filelist $WORK/test.scp -v $LMBASE.dct -d $LMBASE.bin -nlimit 8 -htkconf $AMDIR/hcopy-mfcc2.cfg &> $WORK/log
+    $PREFIX/tools/julius-4.3.1/julius/julius -C $JCONF -bs $BEAM -walign -h $AMDIR/juliusBin.mmf -hlist $AMDIR/julius.tie -input file -filelist $WORK/test.scp -v $LMBASE.dct -d $LMBASE.bin -lmp 13.0 0.0 -lmp2 13.0 0.0 -nlimit 8 -htkconf $AMDIR/hcopy-mfcc2.cfg &> $WORK/log
   else
-    $PREFIX/tools/julius-4.3.1/julius/julius -C $JCONF -bs $BEAM -walign -h $AMDIR/juliusBin.mmf -hlist $AMDIR/julius.tie -input file -filelist $WORK/test.scp -v $LMBASE.dct -d $LMBASE.bin -htkconf $AMDIR/hcopy-mfcc2.cfg &> $WORK/log
+    $PREFIX/tools/julius-4.3.1/julius/julius -C $JCONF -bs $BEAM -walign -h $AMDIR/juliusBin.mmf -hlist $AMDIR/julius.tie -input file -filelist $WORK/test.scp -v $LMBASE.dct -d $LMBASE.bin -lmp 13.0 0.0 -lmp2 13.0 0.0 -htkconf $AMDIR/hcopy-mfcc2.cfg &> $WORK/log
   fi
 fi
 
