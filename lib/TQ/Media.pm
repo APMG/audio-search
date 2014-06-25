@@ -40,6 +40,12 @@ __PACKAGE__->meta->setup(
             default  => 'A',
             not_null => 1,
         },
+        decoder => {
+            type     => 'char',
+            length   => 1,
+            default  => 'K',
+            not_null => 1,
+        },
         user_id    => { type => 'integer',  not_null => 1, },
         duration   => { type => 'integer', },
         created_by => { type => 'integer',  not_null => 1 },

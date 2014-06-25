@@ -74,6 +74,7 @@ create table if not exists media (
     created_at      datetime not null,
     updated_at      datetime not null,
     status          char(1) not null default 'A',
+    decoder         char(1) not null default 'K',
     name            varchar(255),
     uri             text,
     transcript      mediumtext,
