@@ -11,7 +11,11 @@ my $user_guid = shift or die $usage;
 my $user = TQ::User->new( guid => $user_guid )->load;
 
 for my $file (@ARGV) {
-    my $media = TQ::Media->new( owner => $user, uri => $file );
+    my $media = TQ::Media->new(
+        owner   => $user,
+        uri     => $file,
+        decoder => ( $ENV{TQ_DECODER} || 'K' ),
+    );
     $media->save();
 }
 

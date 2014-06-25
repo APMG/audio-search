@@ -13,19 +13,72 @@ use JSON;
 use Getopt::Long;
 use Pod::Usage;
 
+=head1 NAME
+
+mk-transcript - create transcript for audio files
+
+=head1 SYNOPSIS
+
+ % mk-transcript uuid
+ % mk-transcript --decoder J uuid
+ % mk-transcript --force uuid
+
+=head1 DESCRIPTION
+
+mk-transcript creates a transcript for a TQ::Media object in the database.
+The I<uuid> value should refer to the media.uuid value in the database record.
+
+=head1 OPTIONS
+
+=head2 converter I<path/to/script>
+
+Will use I<path/to/script> as the conversion tool. Defaults to B<kaldi-cantabAPM.sh>.
+See also L<decoder>.
+
+=head2 decoder I<flag>
+
+Pick a decoder. Shortcut for the built-in L<converter> scripts. Use a I<flag>
+value of C<K> for kaldi-cantabAPM.sh and of C<J> for julius-cantabAPM.sh.
+
+=head2 force
+
+Overwrite .wav and/or .json files that may already exist.
+
+=head2 debug
+
+Print lots of stuff to stderr.
+
+=head2 help
+
+See the usage statement.
+
+=cut
+
 my $converter = "$FindBin::Bin/../kaldi-cantabAPM.sh";
+my $decoder   = '';
 my $help      = 0;
 my $force     = 0;
 my $debug     = 0;
 GetOptions(
     'help'        => \$help,
     'converter=s' => \$converter,
+    'decoder=s'   => \$decoder,
     'force'       => \$force,
     'debug'       => \$debug,
 ) or pod2usage(2);
 pod2usage(1) if $help;
 
-my $media_id = shift(@ARGV) or die "$0 media_id";
+my $media_id = shift(@ARGV) or pod2usage(2);
+
+# toggle converter if decoder is set
+if ($decoder) {
+    if ( $decoder eq 'K' ) {
+        $converter = "$FindBin::Bin/../kaldi-cantabAPM.sh";
+    }
+    elsif ( $decoder eq 'J' ) {
+        $converter = "$FindBin::Bin/../julius-cantabAPM.sh";
+    }
+}
 
 my $media;
 for my $col (qw( uuid id )) {

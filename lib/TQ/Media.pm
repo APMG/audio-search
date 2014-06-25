@@ -106,7 +106,8 @@ sub create_job {
         xid        => $id,
         type       => 'M',
         created_by => $self->user_id,
-        cmd        => qq/mk-transcript $uuid/,
+        cmd =>
+            sprintf( "mk-transcript --decoder %s %s", $self->decoder, $uuid ),
     );
     $job->save();
 }
