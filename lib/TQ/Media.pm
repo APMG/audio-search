@@ -20,6 +20,11 @@ my %NICE_STATUS = (
     F => 'Failed to process',
 );
 
+my %NICE_DECODER = (
+    J => 'Julius',
+    K => 'Kaldi',
+);
+
 # from Audio::Scan
 my %AUDIO_FORMATS = (
     1  => 'wav',
@@ -279,6 +284,11 @@ sub duration_as_hms {
     my $self = shift;
     my $ms = $self->duration || 0;
     return TQ::Utils::ms2hms($ms);
+}
+
+sub nice_decoder {
+    my $self = shift;
+    return $NICE_DECODER{ $self->decoder };
 }
 
 1;

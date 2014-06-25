@@ -9,6 +9,10 @@
    <div class="input-group">
     <input size="128" name="name" type="text" class="form-control" placeholder="Name">
     <input size="128" name="uri" type="text" class="form-control" placeholder="URI">
+    Decoder: <select class="form-control" id="decoder">
+     <option value="J">Julius</option>
+     <option value="K" selected="selected">Kaldi</option>
+    </select>
    </div>
    <div class="btn-group">
     <a onclick="TQ.createMedia($(this), $('#media .panel-body')); return false;" href="#" class="btn btn-primary" role="button">Create</a>

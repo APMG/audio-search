@@ -15,6 +15,7 @@
    <tr><th>Created</th><td>[% media.created_at %]</td></tr>
    <tr><th>Updated</th><td>[% media.updated_at %]</td></tr>
    <tr><th>Status</th><td>[% media.nice_status() %]</td></tr>
+   <tr><th>Decoder</th><td>[% media.nice_decoder() %]</td></tr>
    <tr><th>URI</th><td class="tq-uri">[% media.uri %]</td></tr>
    <tr><th>Transcript</td><td>[% media.transcript_as_text(20) %]</td></tr>
    <tr><th>Keywords</th>

@@ -96,7 +96,8 @@ TQ.createMedia = function(btn, el, user) {
     var uri = $('[name="uri"]').val();
     var mname = $('[name="name"]').val();
     var mediaUri = TQ.APIBase + '/user/' + user.guid + '/media';
-    var payload = { uri : uri, name: mname };
+    var decoder  = $('#decoder').val();
+    var payload = { uri : uri, name: mname, decoder: decoder };
     var alerts = $('#create-media-alerts');
 
     if (!uri) {
