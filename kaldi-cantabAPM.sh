@@ -40,7 +40,7 @@ fi
 
 mkdir -p $WORK
 
-echo "==================== Running audio segmentation ====================="
+echo "=================== Segmenting audio ================="
 cp $INPUT $WORK/$wavName.wav
 echo $wavName | perl -pe "s:^:$WORK/tmp-rec/:" | perl -pe 's:^(.*)/.*$:$1:' | sort -u | xargs --no-run-if-empty mkdir -p
 
@@ -78,8 +78,10 @@ paste $dataPrep/nums $dataPrep/nums > $dataPrep/utt2spk
 # PATH is wonky so just run relative to our tools
 cd $PREFIX
 cat $dataPrep/utt2spk | sort -k 2 | utils/utt2spk_to_spk2utt.pl > $dataPrep/spk2utt
+steps/make_mfcc.sh --nj $nj --cmd "$train_cmd" --mfcc-config exp/mfcc.conf $dataPrep exp/make_mfcc/test $WORK/mfcc
+steps/compute_cmvn_stats.sh $dataPrep exp/make_mfcc/test $WORK/mfcc
 
-echo "================== Decoding =================="
+echo "=================== Decoding ===================="
 decodeDirF=exp/tri3/decode-$$
 decodeDir=exp/tri3_mmi_b0.1/decode-$$
 steps/decode_fmllr.sh --nj $decode_nj --cmd "$decode_cmd" --acwt $amw --skip_scoring true exp/tri3/graph $dataPrep $decodeDirF
@@ -100,5 +102,5 @@ done
 awk '{print $2}' $dataPrep/wav.scp | sed 's/.wav//g' > $WORK/tmp.scp
 scripts/kaldi2json.pl $WORK/tmp.scp $WORK/tmp.mlf > $OUTPUT
 
-echo "Cleaning up"
-rm -rf $WORK $decodeDir* $decodeDirF* exp/make_mfcc
+echo "================== Cleaning up =================="
+#rm -rf $WORK $decodeDir* $decodeDirF* exp/make_mfcc
