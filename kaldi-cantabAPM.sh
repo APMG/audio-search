@@ -9,7 +9,7 @@ PATHSETTER=$PREFIX/set-kaldi-path.sh
 TMPDIR=/var/extra/audio/work
 
 nj=8
-decode_nj=2
+decode_nj=8
 lmw=14.0
 amw=`echo $lmw | awk '{print 1/$1}'`
 QUEUE=false
