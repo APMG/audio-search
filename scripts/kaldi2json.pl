@@ -25,6 +25,10 @@ for my $dbl (@dbl_lines) {
     chomp $dbl;
     my ( $stem, $offset ) = ( $dbl =~ m/^(.*)-(\d+\.\d+)\+\d+\.\d+$/ );
     my $n = 0;
+    if ( !exists $mlf_hash{$dbl} ) {
+        warn "Failed to find '$dbl' in mlf_file $mlf_file";
+        next;
+    }
     while ( $mlf_hash{$dbl} =~ m/(\d+)\s*(\d+)\s(.*?)\n/gs ) {
         my $init = $offset + ( $1 / $scale );
         my $dur  = ( $2 / $scale );

@@ -42,6 +42,10 @@ for my $dbl (@dbl_lines) {
         s/0.000/undefined/ for @conf;
     }
     my $n = 0;
+    if ( !exists $mlf_hash{$dbl} ) {
+        warn "Failed to find '$dbl' in mlf_file $mlf_file";
+        next;
+    }
     while ( $mlf_hash{$dbl} =~ m/\[ *(\d+) +(\d+)\].*? +(.*?)  (.*?)\t/gs ) {
         my $init = ( $offset + 0.01 * $1 );
         my $quit = ( $offset + 0.01 * ( $2 + 1 ) );
