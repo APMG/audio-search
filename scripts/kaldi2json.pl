@@ -41,13 +41,15 @@ my @dbl_lines = read_lines($dbl_file);
 my @words     = ();
 for my $dbl (@dbl_lines) {
     chomp $dbl;
+    my $filename = $dbl;
+    $filename =~ s,^.*/,,;
     my ( $stem, $offset ) = ( $dbl =~ m/^(.*)-(\d+\.\d+)\+\d+\.\d+$/ );
     my $n = 0;
-    if ( !exists $mlf_hash{$dbl} ) {
-        warn "Failed to find '$dbl' in mlf_file $mlf_file";
+    if ( !exists $mlf_hash{$filename} ) {
+        warn "Failed to find '$filename' in mlf_file $mlf_file";
         next;
     }
-    for my $line ( @{ $mlf_hash{$dbl} } ) {
+    for my $line ( @{ $mlf_hash{$filename} } ) {
         chomp $line;
         my @parts = split( /\ +/, $line );
 
