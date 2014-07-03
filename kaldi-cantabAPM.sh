@@ -47,6 +47,11 @@ echo $wavName | perl -pe "s:^:$WORK/tmp-rec/:" | perl -pe 's:^(.*)/.*$:$1:' | so
 rm -f $WORK/splitFiles.dbl
 $PREFIX/scripts/wav2pem $WORK/$wavName.wav $WORK/tmp-rec/$wavName.pem $PREFIX/tools
 
+if [ ! -f "$WORK/tmp-rec/$wavName.pem" ]; then
+    echo "Failed to create $WORK/tmp-rec/$wavName.pem"
+    exit
+fi
+
 cat $WORK/tmp-rec/$wavName.pem | egrep -v '^;;' | while read dummy chan spkr init quit cond ; do
   durn=`printf "%.2f" $(perl -e "print $quit-$init")`
   needSplit=$(awk 'BEGIN{ print ('$durn' > 45) }')
