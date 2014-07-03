@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use TQ::Utils;
+use Audio::Scan;
+use Data::Dump qw( dump );
+
+my $debug = $ENV{AUDIO_DEBUG} || 0;
+
+# from Audio::Scan
+my %AUDIO_FORMATS = (
+    1  => 'wav',
+    85 => 'wav-mp3',
+);
+
+for my $file (@ARGV) {
+    my ( $base, $ext ) = ( $file =~ m/^(.+)\.(\w+)$/ );
+    my $scan = Audio::Scan->scan_info($file);
+    $debug and warn dump $scan->{info};
+    $debug and warn sprintf( "length: %s\n",
+        TQ::Utils::ms2hms( $scan->{info}->{song_length_ms} ) );
+
+    my $format = $AUDIO_FORMATS{ $scan->{info}->{format} || '' } || 'wav';
+    my $wav16k;
+    my $is_mono = 1;
+    if ( defined $scan->{info}->{channels}
+        and $scan->{info}->{channels} != 1 )
+    {
+        $is_mono = 0;
+    }
+    if (    $scan->{info}->{samplerate} == 16000
+        and $is_mono
+        and $format eq 'wav' )
+    {
+        $wav16k = $file;
+    }
+    elsif ( lc $ext eq 'mp3' ) {
+        TQ::Utils::run_it( "lame --decode $file $base.wav", $debug );
+        TQ::Utils::run_it( "sox $base.wav -r 16000 -c 1 $base-16k.wav",
+            $debug );
+        $wav16k = "$base-16k.wav";
+    }
+    elsif ( lc $ext eq 'wav' ) {
+        if ( $format ne 'wav' ) {
+            warn "File has .wav extension but is not a WAV format";
+            next;
+        }
+        TQ::Utils::run_it( "sox $file -r 16000 -c 1 $base-16k.wav", $debug );
+        $wav16k = "$base-16k.wav";
+    }
+    else {
+        warn "Failed to create 16k wav file from $file";
+        next;
+    }
+
+    printf( "%s => %s\n", $file, $wav16k );
+}
