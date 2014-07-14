@@ -20,7 +20,10 @@ if [ ! -d $(dirname $0)/$CHECKOUT_PATH ]; then
   make -j $n )
 fi
 
-rsync -a --exclude .svn $CHECKOUT_PATH/egs/wsj/s5/steps/ $(dirname $0)/steps
-rsync -a --exclude .svn $CHECKOUT_PATH/egs/wsj/s5/utils/ $(dirname $0)/utils
-
-rm -rf tools/kaldi-trunk/egs
+if [ -d $CHECKOUT_PATH/egs/wsj/s5/steps ]; then
+  rsync -a --exclude .svn $CHECKOUT_PATH/egs/wsj/s5/steps/ $(dirname $0)/steps
+  rsync -a --exclude .svn $CHECKOUT_PATH/egs/wsj/s5/utils/ $(dirname $0)/utils
+  rm -rf tools/kaldi-trunk/egs
+else
+  echo "It appears Kaldi could not be built. You will not be able to use the Kaldi decoder."
+fi
