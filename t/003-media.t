@@ -31,7 +31,7 @@ ok( my $media = MyTestMedia->new(
 ok( $media->uuid, "media->uuid default set" );
 
 ok( my $job = $media->jobs->[0], "one job created" );
-is( $job->cmd, sprintf( "mk-transcript %s", $media->uuid ), "job cmd" );
+is( $job->cmd, sprintf( "mk-transcript --decoder K %s", $media->uuid ), "job cmd" );
 is( $job->type, 'M', "job->type == M" );
 
 # clean up
